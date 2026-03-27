@@ -716,7 +716,7 @@ int main() {
 
 ---
 
-### Challenge (For Fast Students)
+### Challenge
 
 **8. Pointer arithmetic:**
 
@@ -731,29 +731,6 @@ printf("%d\\n", *ptr);       // ?
 \`\`\`
 
 <!--ANSWER_8-->
-
-**9. What's wrong here? (Dangling pointer)**
-
-\`\`\`c
-int* createValue() {
-    int x = 42;
-    return &x;   // what happens?
-}
-
-int main() {
-    int *p = createValue();
-    printf("%d\\n", *p);  // will this work?
-    return 0;
-}
-\`\`\`
-
-> Local variables **die** when the function ends. Returning their address is **dangerous**. This plants the seed for \`malloc\` later.
-
-<!--ANSWER_9-->
-
-**10.** Write a function \`void separateEvenOdd(int arr[], int size, int even[], int *evenCount, int odd[], int *oddCount)\` that splits an array into even and odd numbers.
-
-<!--ANSWER_10-->
 
 ---
 
@@ -899,14 +876,16 @@ int main() {
         ANSWER_7: {
           title: "Answer — Problem 7",
           content: `
-<pre><code class="language-c">void reverseArray(int *arr, int size) {
+<pre><code class="language-c">#include <stdio.h>
+
+void reverseArray(int arr[], int size) {
     int left = 0;
     int right = size - 1;
     while (left < right) {
-        // swap arr[left] and arr[right]
-        int temp = *(arr + left);
-        *(arr + left) = *(arr + right);
-        *(arr + right) = temp;
+        // swap arr[left] and arr[right] using array notation
+        int temp = arr[left];
+        arr[left] = arr[right];
+        arr[right] = temp;
         left++;
         right--;
     }
@@ -918,13 +897,13 @@ int main() {
 
     printf("Before: ");
     for (int i = 0; i < size; i++) printf("%d ", nums[i]);
-    printf("\\n");
+    printf("\n");
 
     reverseArray(nums, size);
 
     printf("After:  ");
     for (int i = 0; i < size; i++) printf("%d ", nums[i]);
-    printf("\\n");
+    printf("\n");
     // Output: 5 4 3 2 1 ✅
     return 0;
 }</code></pre>
@@ -947,80 +926,6 @@ int main() {
   <li><code>*ptr</code> → <code>arr[1]</code> = <strong>20</strong></li>
 </ul>
 <p><strong>Key insight:</strong> When you add <code>n</code> to a pointer, it doesn't add <code>n</code> bytes — it adds <code>n * sizeof(type)</code> bytes. So <code>ptr + 2</code> on an <code>int*</code> moves 8 bytes forward (2 × 4 bytes).</p>
-`,
-        },
-        ANSWER_9: {
-          title: "Answer — Problem 9",
-          content: `
-<p><strong>This is a DANGLING POINTER bug!</strong></p>
-<pre><code class="language-c">int* createValue() {
-    int x = 42;     // x is LOCAL — lives on the stack
-    return &x;      // returning address of a local variable! 💀
-}   // x DIES here — memory is freed
-
-int main() {
-    int *p = createValue();  // p points to DEAD memory
-    printf("%d\\n", *p);      // UNDEFINED BEHAVIOR!
-    // Might print 42, might print garbage, might crash
-    return 0;
-}</code></pre>
-<p><strong>Why it's dangerous:</strong></p>
-<ul>
-  <li><code>x</code> is a local variable that lives only during <code>createValue()</code></li>
-  <li>When the function returns, <code>x</code> is destroyed</li>
-  <li>The pointer <code>p</code> now points to memory that's been freed</li>
-  <li>This is called a <strong>dangling pointer</strong></li>
-</ul>
-<p><strong>Fix (preview of malloc — coming in a future lab):</strong></p>
-<pre><code class="language-c">int* createValue() {
-    int *x = malloc(sizeof(int));  // allocate on HEAP — survives!
-    *x = 42;
-    return x;  // ✅ safe — memory persists
-}</code></pre>
-`,
-        },
-        ANSWER_10: {
-          title: "Answer — Problem 10",
-          content: `
-<pre><code class="language-c">void separateEvenOdd(int arr[], int size, int even[], int *evenCount, int odd[], int *oddCount) {
-    *evenCount = 0;
-    *oddCount = 0;
-    for (int i = 0; i < size; i++) {
-        if (arr[i] % 2 == 0) {
-            even[*evenCount] = arr[i];
-            (*evenCount)++;     // parentheses matter! *(evenCount)++ is different!
-        } else {
-            odd[*oddCount] = arr[i];
-            (*oddCount)++;
-        }
-    }
-}
-
-int main() {
-    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
-    int size = 8;
-    int even[8], odd[8];
-    int evenCount, oddCount;
-
-    separateEvenOdd(arr, size, even, &evenCount, odd, &oddCount);
-
-    printf("Even: ");
-    for (int i = 0; i < evenCount; i++) printf("%d ", even[i]);
-    printf("\\n");
-
-    printf("Odd: ");
-    for (int i = 0; i < oddCount; i++) printf("%d ", odd[i]);
-    printf("\\n");
-
-    // Even: 2 4 6 8
-    // Odd: 1 3 5 7
-    return 0;
-}</code></pre>
-<p><strong>Watch out:</strong> <code>(*evenCount)++</code> is NOT the same as <code>*evenCount++</code>!</p>
-<ul>
-  <li><code>(*evenCount)++</code> → go to address, get value, increment the VALUE ✅</li>
-  <li><code>*evenCount++</code> → increment the POINTER, then dereference ❌</li>
-</ul>
 `,
         },
       };
