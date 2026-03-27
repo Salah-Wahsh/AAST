@@ -1,0 +1,1116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pointers in C — Lab Guide</title>
+
+    <!-- Prism.js Theme -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+
+    <style>
+      /* ── Base ── */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", "Segoe UI", Arial, sans-serif;
+        background: #ffffff;
+        color: #0b0f14;
+        line-height: 1.8;
+        font-size: 22px;
+        padding: 3rem;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      /* ── Typography ── */
+      h1 {
+        color: #0a58ca;
+        font-size: 3rem;
+        font-weight: 800;
+        border-bottom: 3px solid #d0d7de;
+        padding-bottom: 0.6rem;
+        margin: 2.5rem 0 1.5rem;
+      }
+
+      h2 {
+        color: #1f6feb;
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 2.5rem 0 1.2rem;
+      }
+
+      h3 {
+        color: #6f42c1;
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin: 2rem 0 0.8rem;
+      }
+
+      h4 {
+        color: #b45309;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 1.5rem 0 0.5rem;
+      }
+
+      p {
+        margin: 1rem 0;
+        max-width: 75ch;
+      }
+
+      a {
+        color: #0a58ca;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      strong {
+        color: #000;
+        font-weight: 700;
+      }
+
+      /* ── Inline Code ── */
+      :not(pre) > code {
+        background: #f3f4f6;
+        color: #b91c1c;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        font-family: "Fira Code", "Consolas", monospace;
+        font-size: 0.95em;
+        font-weight: 500;
+      }
+
+      /* ── Code Blocks ── */
+      pre {
+        border-radius: 10px;
+        padding: 1.5rem;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        font-size: 0.95em;
+        line-height: 1.7;
+      }
+
+      pre code {
+        background: none !important;
+        color: inherit;
+        padding: 0;
+        font-family: "Fira Code", "Consolas", monospace;
+      }
+
+      /* ── Blockquotes ── */
+      blockquote {
+        border-left: 6px solid #1f6feb;
+        background: #eef4ff;
+        padding: 1rem 1.4rem;
+        margin: 1.5rem 0;
+        border-radius: 0 10px 10px 0;
+        font-size: 1.05em;
+      }
+
+      blockquote p {
+        margin: 0.4rem 0;
+      }
+
+      /* ── Tables ── */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        font-size: 0.95em;
+      }
+
+      th {
+        background: #eef4ff;
+        color: #0a58ca;
+        text-align: left;
+        padding: 0.9rem 1.2rem;
+        border: 1px solid #d0d7de;
+        font-weight: 700;
+      }
+
+      td {
+        padding: 0.8rem 1.2rem;
+        border: 1px solid #d0d7de;
+      }
+
+      tr:nth-child(even) {
+        background: #f9fafb;
+      }
+
+      /* ── Lists ── */
+      ul,
+      ol {
+        padding-left: 2rem;
+        margin: 1rem 0;
+      }
+
+      li {
+        margin: 0.6rem 0;
+      }
+
+      /* ── Horizontal Rule ── */
+      hr {
+        border: none;
+        border-top: 2px solid #d0d7de;
+        margin: 2.5rem 0;
+      }
+
+      /* ── Sidebar nav ── */
+      #sidebar {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        background: #ffffff;
+        border: 1px solid #d0d7de;
+        border-radius: 10px;
+        padding: 1.2rem;
+        max-width: 280px;
+        max-height: 90vh;
+        overflow-y: auto;
+        font-size: 0.9rem;
+        z-index: 100;
+        display: none;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      #sidebar.open {
+        display: block;
+      }
+
+      #sidebar a {
+        display: block;
+        padding: 0.3rem 0;
+        color: #444;
+      }
+
+      #sidebar a:hover {
+        color: #0a58ca;
+      }
+
+      #toggle-btn {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 200;
+        background: #16a34a;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      #toggle-btn:hover {
+        background: #15803d;
+      }
+
+      /* ── Header Styles ── */
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 4px solid #0a58ca;
+        padding-bottom: 1rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .header-info h1 {
+        margin: 0;
+        border: none;
+        font-size: 2.2rem;
+        color: #000;
+      }
+
+      .header-info p {
+        margin: 0;
+        color: #444;
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+
+      .aast-logo {
+        height: 150px;
+        width: auto;
+      }
+
+      /* ── Answer Reveal ── */
+      .answer-toggle {
+        display: inline-block;
+        background: #16a34a;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1.2rem;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0.8rem 0 0.2rem;
+        transition: background 0.2s;
+      }
+
+      .answer-toggle:hover {
+        background: #15803d;
+      }
+
+      .answer-toggle.revealed {
+        background: #dc2626;
+      }
+
+      .answer-toggle.revealed:hover {
+        background: #b91c1c;
+      }
+
+      .answer-block {
+        display: none;
+        background: #f0fdf4;
+        border-left: 6px solid #16a34a;
+        border-radius: 0 10px 10px 0;
+        padding: 1rem 1.4rem;
+        margin: 0.5rem 0 1.5rem;
+        animation: fadeIn 0.3s ease;
+      }
+
+      .answer-block.visible {
+        display: block;
+      }
+
+      .answer-block h4 {
+        color: #16a34a;
+        margin: 0 0 0.5rem 0;
+      }
+
+      .answer-block pre {
+        margin: 0.8rem 0;
+      }
+
+      .answer-block p {
+        margin: 0.4rem 0;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* ── Print ── */
+      @media print {
+        body {
+          background: #fff;
+          color: #000;
+          font-size: 14pt;
+        }
+
+        pre {
+          background: #f3f4f6 !important;
+          color: #000 !important;
+          border: 1px solid #ccc;
+        }
+
+        :not(pre) > code {
+          background: #f3f4f6;
+          color: #b91c1c;
+        }
+
+        #sidebar,
+        #toggle-btn {
+          display: none !important;
+        }
+
+        .answer-block {
+          display: block !important;
+        }
+
+        .answer-toggle {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header-container">
+      <div class="header-info">
+        <h1>Salah Wahsh</h1>
+        <p>Teaching Assistant</p>
+        <p>Arab Academy for Science, Technology & Maritime Transport</p>
+      </div>
+      <img
+        src="https://aast.edu/template/en/colleges-all/img/logo-blue03.webp"
+        alt="AAST Logo"
+        class="aast-logo"
+      />
+    </header>
+
+    <button id="toggle-btn" onclick="toggleNav()">☰ Nav</button>
+    <div id="sidebar"></div>
+
+    <div id="content"></div>
+
+    <!-- Markdown parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+
+    <script>
+      const md = `
+# Pointers in C: Lab Guide
+
+## 2. Phase 1: The "WHY"
+
+**Callback to the functions lab:**
+
+\`\`\`c
+void swap(int a, int b) {
+    int temp = a;
+    a = b;
+    b = temp;
+    printf("Inside swap: a=%d, b=%d\\n", a, b);
+}
+
+int main() {
+    int x = 5, y = 10;
+    swap(x, y);
+    printf("In main: x=%d, y=%d\\n", x, y);
+    return 0;
+}
+\`\`\`
+
+\`\`\`
+Inside swap: a=10, b=5
+In main: x=5, y=10     ← DIDN'T SWAP!
+\`\`\`
+
+> **"Remember pass by value from last lab? The function got COPIES. It swapped the copies and the originals didn't change. So... how do we ACTUALLY swap them?"**
+
+> **"We need a way to reach INTO main and change the original variables. That's what pointers do."**
+
+---
+
+## 3. Phase 2: The "WHAT" — Core Concepts
+
+### Memory
+
+\`\`\`
+┌──────────┬───────┐
+│ Address  │ Value │
+├──────────┼───────┤
+│ 0x1000   │  5    │  ← int x = 5;
+│ 0x1004   │  10   │  ← int y = 10;
+│ 0x1008   │ 0x1004│  ← int *ptr = &y;
+│ 0x100C   │  ???  │
+└──────────┴───────┘
+\`\`\`
+
+---
+
+### The Two Operators — \`&\` and \`*\`
+
+#### The \`&\` Operator (Address-of) — "WHERE do you live?"
+
+\`\`\`c
+int x = 5;
+printf("Value of x: %d\\n", x);     // 5
+printf("Address of x: %p\\n", &x);  // 0x7ffc12345678 (some address)
+\`\`\`
+
+> **\`&x\` means: "Give me the ADDRESS where x lives"**
+>
+> Think of it as asking someone: **"What's your home address?"**
+
+**Live demo — show real addresses:**
+
+\`\`\`c
+int a = 10, b = 20, c = 30;
+printf("a lives at: %p\\n", &a);
+printf("b lives at: %p\\n", &b);
+printf("c lives at: %p\\n", &c);
+\`\`\`
+
+> "The addresses are 4 bytes apart! Because each \`int\` is 4 bytes."
+
+#### The \`*\` Operator (Dereference) — "Go TO that address and look inside"
+
+\`\`\`c
+int x = 5;
+int *ptr = &x;    // ptr stores the address of x
+
+printf("Address stored in ptr: %p\\n", ptr);   // address of x
+printf("Value at that address: %d\\n", *ptr);  // 5
+\`\`\`
+
+> **\`*ptr\` means: "Go to the address stored in ptr and give me what's there"**
+>
+> Think of it as: **"Go to this home address and tell me who's inside."**
+
+---
+
+### Step 3: The Confusing Part — \`*\` Has TWO Meanings
+
+\`\`\`c
+int *ptr = &x;   // HERE: * means "I'm DECLARING a pointer"
+*ptr = 20;       // HERE: * means "Go TO the address (dereference)"
+\`\`\`
+
+| Context | \`*\` Means |
+|---|---|
+| \`int *ptr = &x;\` | "ptr is a **pointer** to an int" (declaration) |
+| \`*ptr = 20;\` | "Go to where ptr points and **change** the value" (dereference) |
+| \`printf("%d", *ptr);\` | "Go to where ptr points and **read** the value" (dereference) |
+
+> **"Yes, C reuses the same symbol for two different things. In a declaration, \`*\` creates a pointer. Everywhere else, \`*\` follows the pointer."**
+
+---
+
+### The Complete Picture
+
+\`\`\`c
+int x = 5;
+int *ptr = &x;
+\`\`\`
+
+\`\`\`
+VARIABLE    ADDRESS     VALUE
+┌──────┬────────────┬─────────┐
+│  x   │  0x1000    │    5    │
+├──────┼────────────┼─────────┤
+│  ptr │  0x1008    │ 0x1000  │  ← stores x's address!
+└──────┴────────────┴─────────┘
+
+ptr ──────────→ x
+               [5]
+\`\`\`
+
+
+\`\`\`c
+int x = 5;
+int *ptr = &x;
+
+printf("%d\\n", x);       // 5      (read x directly)
+printf("%d\\n", *ptr);    // 5      (read x through pointer)
+
+*ptr = 99;               // change x THROUGH the pointer
+
+printf("%d\\n", x);       // 99!    (x changed!)
+printf("%d\\n", *ptr);    // 99     (same thing)
+\`\`\`
+
+
+---
+
+### NOW Solve the Swap Problem
+
+\`\`\`c
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int main() {
+    int x = 5, y = 10;
+    swap(&x, &y);         // pass ADDRESSES, not values
+    printf("x=%d, y=%d\\n", x, y);  // x=10, y=5 ✅
+    return 0;
+}
+\`\`\`
+
+
+---
+
+### Arrays ARE Pointers
+
+\`\`\`c
+int arr[] = {10, 20, 30};
+
+printf("arr = %p\\n", arr);         // address of first element
+printf("&arr[0] = %p\\n", &arr[0]); // SAME address!
+\`\`\`
+
+> **"When you pass an array to a function, you're actually passing a POINTER to its first element."**
+
+\`\`\`c
+void changeFirst(int *arr) {
+    arr[0] = 999;
+}
+
+int main() {
+    int nums[] = {1, 2, 3};
+    changeFirst(nums);
+    printf("%d\\n", nums[0]);    // 999
+    return 0;
+}
+\`\`\`
+
+---
+
+### scanf Finally Makes Sense
+
+\`\`\`c
+int age;
+scanf("%d", &age);   // WHY &age? Because scanf needs the ADDRESS to modify it!
+\`\`\`
+
+
+> **"You've been using pointers since day one without knowing it!"**
+
+---
+
+## 4. Common \`&\` and \`*\` Mistakes
+
+### The Golden Rules
+
+\`\`\`
+OPERATOR    NAME             MEANING                    EXAMPLE
+────────────────────────────────────────────────────────────────
+  &         Address-of       "Where does this live?"    &x → address of x
+  *         Dereference      "What's at this address?"  *ptr → value at ptr
+  *         (declaration)    "This is a pointer"        int *ptr;
+\`\`\`
+
+### Mistakes probably you will make
+
+\`\`\`c
+// ❌ MISTAKE 1: Forgetting &
+int x = 5;
+int *ptr = x;        // WRONG! x is 5, not an address
+int *ptr = &x;       // ✅ CORRECT
+
+// ❌ MISTAKE 2: Using uninitialized pointer
+int *ptr;
+*ptr = 10;           // WRONG! ptr points to garbage
+// Always initialize: int *ptr = &someVariable;
+
+// ❌ MISTAKE 3: Confusing ptr and *ptr
+int x = 5;
+int *ptr = &x;
+printf("%d\\n", ptr);     // WRONG — prints address as integer
+printf("%d\\n", *ptr);    // ✅ prints 5
+printf("%p\\n", ptr);     // ✅ prints address properly
+
+// ❌ MISTAKE 4: Wrong type
+int x = 5;
+float *ptr = &x;    // WRONG! int* and float* don't match
+int *ptr = &x;      // ✅ CORRECT
+
+// ❌ MISTAKE 5: Double & or double *
+int x = 5;
+int *ptr = &&x;     // ❌ Nonsense
+\`\`\`
+
+### Quick Reference Table
+
+\`\`\`
+int x = 5;
+int *ptr = &x;
+
+x       →  5           (the value)
+&x      →  0x1000      (the address of x)
+ptr     →  0x1000      (same as &x)
+*ptr    →  5           (same as x)
+&ptr    →  0x1008      (address of ptr itself)
+\`\`\`
+
+> **"If you can read this table and understand every line, you understand pointers."**
+
+---
+
+## 5. Practice Problems
+
+### Warm-Up
+
+**1. Predict the output:**
+
+\`\`\`c
+int a = 10;
+int *p = &a;
+printf("%d\\n", *p);
+*p = 20;
+printf("%d\\n", a);
+\`\`\`
+
+<!--ANSWER_1-->
+
+**2. Fix this broken code:**
+
+\`\`\`c
+int x = 42;
+int *ptr;
+ptr = x;              // what's wrong?
+printf("%d\\n", ptr);   // what's wrong?
+\`\`\`
+
+<!--ANSWER_2-->
+
+**3. Write the output:**
+
+\`\`\`c
+int x = 1, y = 2;
+int *p1 = &x, *p2 = &y;
+*p1 = *p2;
+printf("x=%d y=%d\\n", x, y);
+\`\`\`
+
+<!--ANSWER_3-->
+
+---
+
+### Core Practice (Medium)
+
+**4.** Write a function \`void doubleValue(int *n)\` that doubles the value pointed to:
+
+\`\`\`c
+int main() {
+    int num = 5;
+    doubleValue(&num);
+    printf("%d\\n", num);  // should print 10
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_4-->
+
+**5.** Write a function \`void swap(int *a, int *b)\` — implement swap. Test it in main.
+
+<!--ANSWER_5-->
+
+**6.** Write a function \`void getMinMax(int arr[], int size, int *min, int *max)\` that finds both min and max in ONE function:
+
+\`\`\`c
+int main() {
+    int arr[] = {3, 7, 1, 9, 4};
+    int min, max;
+    getMinMax(arr, 5, &min, &max);
+    printf("Min=%d, Max=%d\\n", min, max); // Min=1, Max=9
+    return 0;
+}
+\`\`\`
+
+> **KEY insight:** A function can only \`return\` ONE value. With pointers, it can "return" MULTIPLE values through parameters.
+
+<!--ANSWER_6-->
+
+**7.** Write a function \`void reverseArray(int *arr, int size)\` using pointer notation to reverse an array in place.
+
+<!--ANSWER_7-->
+
+---
+
+### Challenge (For Fast Students)
+
+**8. Pointer arithmetic:**
+
+\`\`\`c
+int arr[] = {10, 20, 30, 40, 50};
+int *ptr = arr;
+printf("%d\\n", *ptr);       // ?
+printf("%d\\n", *(ptr + 2)); // ?
+printf("%d\\n", *(ptr + 4)); // ?
+ptr++;
+printf("%d\\n", *ptr);       // ?
+\`\`\`
+
+<!--ANSWER_8-->
+
+**9. What's wrong here? (Dangling pointer)**
+
+\`\`\`c
+int* createValue() {
+    int x = 42;
+    return &x;   // what happens?
+}
+
+int main() {
+    int *p = createValue();
+    printf("%d\\n", *p);  // will this work?
+    return 0;
+}
+\`\`\`
+
+> Local variables **die** when the function ends. Returning their address is **dangerous**. This plants the seed for \`malloc\` later.
+
+<!--ANSWER_9-->
+
+**10.** Write a function \`void separateEvenOdd(int arr[], int size, int even[], int *evenCount, int odd[], int *oddCount)\` that splits an array into even and odd numbers.
+
+<!--ANSWER_10-->
+
+---
+
+## 6. Visual Summary
+
+\`\`\`
+╔══════════════════════════════════════════════════════╗
+║                    POINTERS IN C                     ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║   int x = 5;        x is a BOX containing 5         ║
+║                                                      ║
+║   &x                ADDRESS of the box               ║
+║                     "Where is it?"                   ║
+║                                                      ║
+║   int *ptr = &x;    ptr is a BOX containing          ║
+║                     the ADDRESS of x                 ║
+║                                                      ║
+║   *ptr              GO TO the address in ptr         ║
+║                     and READ/WRITE the value         ║
+║                     "What's inside?"                 ║
+║                                                      ║
+║   ptr ──────────→ [ x = 5 ]                         ║
+║                                                      ║
+╠══════════════════════════════════════════════════════╣
+║  & = "address of"     (gives you the location)      ║
+║  * = "value at"       (follows the arrow)            ║
+╚══════════════════════════════════════════════════════╝
+\`\`\`
+
+---
+`;
+
+      // ── Answer content for each problem ──
+      const answers = {
+        ANSWER_1: {
+          title: "Answer — Problem 1",
+          content: `
+<pre><code class="language-c">10
+20</code></pre>
+<p><strong>Explanation:</strong></p>
+<ul>
+  <li><code>*p</code> dereferences <code>p</code>, which points to <code>a</code> (value 10). Prints <strong>10</strong>.</li>
+  <li><code>*p = 20</code> changes the value at the address <code>p</code> points to — which IS <code>a</code>. So <code>a</code> becomes 20.</li>
+  <li><code>printf("%d", a)</code> prints <strong>20</strong>.</li>
+</ul>
+`,
+        },
+        ANSWER_2: {
+          title: "Answer — Problem 2",
+          content: `
+<p><strong>Two bugs:</strong></p>
+<ol>
+  <li><code>ptr = x;</code> → should be <code>ptr = &x;</code> (need the ADDRESS, not the value)</li>
+  <li><code>printf("%d", ptr);</code> → should be <code>printf("%d", *ptr);</code> (need to DEREFERENCE to get the value)</li>
+</ol>
+<p><strong>Fixed code:</strong></p>
+<pre><code class="language-c">int x = 42;
+int *ptr;
+ptr = &x;                // ✅ store address of x
+printf("%d\\n", *ptr);    // ✅ prints 42</code></pre>
+`,
+        },
+        ANSWER_3: {
+          title: "Answer — Problem 3",
+          content: `
+<pre><code>x=2 y=2</code></pre>
+<p><strong>Explanation:</strong></p>
+<ul>
+  <li><code>*p1 = *p2</code> means: "Go to where p1 points (x) and set it to the value at where p2 points (y)."</li>
+  <li>So <code>x</code> gets the value of <code>y</code>, which is 2.</li>
+  <li><code>y</code> is unchanged. It's still 2.</li>
+  <li>Result: <code>x=2, y=2</code></li>
+</ul>
+<p><strong>Note:</strong> This is NOT a swap! Only x changed. To swap you'd need a <code>temp</code> variable.</p>
+`,
+        },
+        ANSWER_4: {
+          title: "Answer — Problem 4",
+          content: `
+<pre><code class="language-c">void doubleValue(int *n) {
+    *n = *n * 2;    // go to the address, read the value, double it, write it back
+}
+
+int main() {
+    int num = 5;
+    doubleValue(&num);       // pass the ADDRESS of num
+    printf("%d\\n", num);     // prints 10 ✅
+    return 0;
+}</code></pre>
+<p><strong>Key point:</strong> <code>*n = *n * 2</code> — the right side reads the value, multiplies by 2, then the left side writes it back to the same address.</p>
+`,
+        },
+        ANSWER_5: {
+          title: "Answer — Problem 5",
+          content: `
+<pre><code class="language-c">void swap(int *a, int *b) {
+    int temp = *a;   // save value at address a
+    *a = *b;         // put value at address b into address a
+    *b = temp;       // put saved value into address b
+}
+
+int main() {
+    int x = 5, y = 10;
+    swap(&x, &y);
+    printf("x=%d, y=%d\\n", x, y);  // x=10, y=5 ✅
+    return 0;
+}</code></pre>
+<p><strong>Trace:</strong></p>
+<ul>
+  <li><code>temp = *a</code> → temp = 5</li>
+  <li><code>*a = *b</code> → x becomes 10</li>
+  <li><code>*b = temp</code> → y becomes 5</li>
+</ul>
+`,
+        },
+        ANSWER_6: {
+          title: "Answer — Problem 6",
+          content: `
+<pre><code class="language-c">void getMinMax(int arr[], int size, int *min, int *max) {
+    *min = arr[0];
+    *max = arr[0];
+    for (int i = 1; i < size; i++) {
+        if (arr[i] < *min) {
+            *min = arr[i];
+        }
+        if (arr[i] > *max) {
+            *max = arr[i];
+        }
+    }
+}
+
+int main() {
+    int arr[] = {3, 7, 1, 9, 4};
+    int min, max;
+    getMinMax(arr, 5, &min, &max);
+    printf("Min=%d, Max=%d\\n", min, max);  // Min=1, Max=9 ✅
+    return 0;
+}</code></pre>
+<p><strong>Why pointers here?</strong> A function can only <code>return</code> ONE value. But we need TWO results (min AND max). Pointers let us "return" multiple values by writing directly to the caller's variables.</p>
+`,
+        },
+        ANSWER_7: {
+          title: "Answer — Problem 7",
+          content: `
+<pre><code class="language-c">void reverseArray(int *arr, int size) {
+    int left = 0;
+    int right = size - 1;
+    while (left < right) {
+        // swap arr[left] and arr[right]
+        int temp = *(arr + left);
+        *(arr + left) = *(arr + right);
+        *(arr + right) = temp;
+        left++;
+        right--;
+    }
+}
+
+int main() {
+    int nums[] = {1, 2, 3, 4, 5};
+    int size = 5;
+
+    printf("Before: ");
+    for (int i = 0; i < size; i++) printf("%d ", nums[i]);
+    printf("\\n");
+
+    reverseArray(nums, size);
+
+    printf("After:  ");
+    for (int i = 0; i < size; i++) printf("%d ", nums[i]);
+    printf("\\n");
+    // Output: 5 4 3 2 1 ✅
+    return 0;
+}</code></pre>
+<p><strong>Note:</strong> <code>*(arr + i)</code> is the same as <code>arr[i]</code>. Both work! Using pointer notation here to practice.</p>
+`,
+        },
+        ANSWER_8: {
+          title: "Answer — Problem 8",
+          content: `
+<pre><code>10
+30
+50
+20</code></pre>
+<p><strong>Trace:</strong></p>
+<ul>
+  <li><code>*ptr</code> → <code>arr[0]</code> = <strong>10</strong></li>
+  <li><code>*(ptr + 2)</code> → <code>arr[2]</code> = <strong>30</strong> (pointer arithmetic: +2 means skip 2 ints = 8 bytes)</li>
+  <li><code>*(ptr + 4)</code> → <code>arr[4]</code> = <strong>50</strong></li>
+  <li><code>ptr++</code> → ptr now points to <code>arr[1]</code></li>
+  <li><code>*ptr</code> → <code>arr[1]</code> = <strong>20</strong></li>
+</ul>
+<p><strong>Key insight:</strong> When you add <code>n</code> to a pointer, it doesn't add <code>n</code> bytes — it adds <code>n * sizeof(type)</code> bytes. So <code>ptr + 2</code> on an <code>int*</code> moves 8 bytes forward (2 × 4 bytes).</p>
+`,
+        },
+        ANSWER_9: {
+          title: "Answer — Problem 9",
+          content: `
+<p><strong>This is a DANGLING POINTER bug!</strong></p>
+<pre><code class="language-c">int* createValue() {
+    int x = 42;     // x is LOCAL — lives on the stack
+    return &x;      // returning address of a local variable! 💀
+}   // x DIES here — memory is freed
+
+int main() {
+    int *p = createValue();  // p points to DEAD memory
+    printf("%d\\n", *p);      // UNDEFINED BEHAVIOR!
+    // Might print 42, might print garbage, might crash
+    return 0;
+}</code></pre>
+<p><strong>Why it's dangerous:</strong></p>
+<ul>
+  <li><code>x</code> is a local variable that lives only during <code>createValue()</code></li>
+  <li>When the function returns, <code>x</code> is destroyed</li>
+  <li>The pointer <code>p</code> now points to memory that's been freed</li>
+  <li>This is called a <strong>dangling pointer</strong></li>
+</ul>
+<p><strong>Fix (preview of malloc — coming in a future lab):</strong></p>
+<pre><code class="language-c">int* createValue() {
+    int *x = malloc(sizeof(int));  // allocate on HEAP — survives!
+    *x = 42;
+    return x;  // ✅ safe — memory persists
+}</code></pre>
+`,
+        },
+        ANSWER_10: {
+          title: "Answer — Problem 10",
+          content: `
+<pre><code class="language-c">void separateEvenOdd(int arr[], int size, int even[], int *evenCount, int odd[], int *oddCount) {
+    *evenCount = 0;
+    *oddCount = 0;
+    for (int i = 0; i < size; i++) {
+        if (arr[i] % 2 == 0) {
+            even[*evenCount] = arr[i];
+            (*evenCount)++;     // parentheses matter! *(evenCount)++ is different!
+        } else {
+            odd[*oddCount] = arr[i];
+            (*oddCount)++;
+        }
+    }
+}
+
+int main() {
+    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
+    int size = 8;
+    int even[8], odd[8];
+    int evenCount, oddCount;
+
+    separateEvenOdd(arr, size, even, &evenCount, odd, &oddCount);
+
+    printf("Even: ");
+    for (int i = 0; i < evenCount; i++) printf("%d ", even[i]);
+    printf("\\n");
+
+    printf("Odd: ");
+    for (int i = 0; i < oddCount; i++) printf("%d ", odd[i]);
+    printf("\\n");
+
+    // Even: 2 4 6 8
+    // Odd: 1 3 5 7
+    return 0;
+}</code></pre>
+<p><strong>Watch out:</strong> <code>(*evenCount)++</code> is NOT the same as <code>*evenCount++</code>!</p>
+<ul>
+  <li><code>(*evenCount)++</code> → go to address, get value, increment the VALUE ✅</li>
+  <li><code>*evenCount++</code> → increment the POINTER, then dereference ❌</li>
+</ul>
+`,
+        },
+      };
+
+      // Configure marked
+      marked.setOptions({
+        gfm: true,
+        breaks: false,
+      });
+
+      // Render markdown
+      document.getElementById("content").innerHTML = marked.parse(md);
+
+      // Replace answer placeholders with clickable reveal blocks
+      const contentEl = document.getElementById("content");
+      let html = contentEl.innerHTML;
+
+      for (const [key, ans] of Object.entries(answers)) {
+        const placeholder = `<!--${key}-->`;
+        const replacement = `
+          <button class="answer-toggle" onclick="toggleAnswer('${key}', this)">
+            ▶ Show Answer
+          </button>
+          <div class="answer-block" id="${key}">
+            <h4>✅ ${ans.title}</h4>
+            ${ans.content}
+          </div>
+        `;
+        html = html.replace(placeholder, replacement);
+      }
+
+      contentEl.innerHTML = html;
+
+      // Highlight all code blocks with Prism
+      Prism.highlightAll();
+
+      // Build sidebar nav from h1, h2, h3
+      const headings = document.querySelectorAll(
+        "#content h1, #content h2, #content h3",
+      );
+      const sidebar = document.getElementById("sidebar");
+
+      let navHTML =
+        '<strong style="color:#0a58ca;">Navigation</strong><hr style="margin:0.5rem 0; border-color:#d0d7de;">';
+
+      headings.forEach((h, i) => {
+        h.id = "heading-" + i;
+        const indent =
+          h.tagName === "H3"
+            ? "padding-left:1rem;"
+            : h.tagName === "H1"
+              ? "font-weight:bold; color:#0a58ca;"
+              : "font-weight:600;";
+
+        navHTML +=
+          '<a href="#heading-' +
+          i +
+          '" style="' +
+          indent +
+          '">' +
+          h.textContent +
+          "</a>";
+      });
+
+      sidebar.innerHTML = navHTML;
+
+      // ── Toggle Functions ──
+      function toggleAnswer(id, btn) {
+        const block = document.getElementById(id);
+        const isVisible = block.classList.contains("visible");
+
+        if (isVisible) {
+          block.classList.remove("visible");
+          btn.textContent = "▶ Show Answer";
+          btn.classList.remove("revealed");
+        } else {
+          block.classList.add("visible");
+          btn.textContent = "▼ Hide Answer";
+          btn.classList.add("revealed");
+          // Re-highlight any code inside the newly revealed block
+          Prism.highlightAllUnder(block);
+        }
+      }
+
+      function toggleNav() {
+        sidebar.classList.toggle("open");
+      }
+
+      window.toggleAnswer = toggleAnswer;
+      window.toggleNav = toggleNav;
+    </script>
+  </body>
+</html>
