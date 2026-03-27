@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AAST Labs — Home</title>
+    <title>AAST Labs — Try Not to Segfault</title>
     <style>
       * {
         margin: 0;
@@ -12,10 +12,10 @@
       }
 
       body {
-        font-family: "Inter", "Segoe UI", Arial, sans-serif;
-        background: #ffffff;
-        color: #0b0f14;
-        line-height: 1.7;
+        font-family: "Inter", "Segoe UI", sans-serif;
+        background: #ffffff; /* Clean white */
+        color: #1a1f23; /* Deep charcoal for readability */
+        line-height: 1.6;
         font-size: 18px;
         padding: 2.5rem 1.5rem 4rem;
         max-width: 1100px;
@@ -23,112 +23,143 @@
       }
 
       header {
-        margin-bottom: 2.5rem;
-        padding-bottom: 1.25rem;
-        border-bottom: 3px solid #d0d7de;
+        margin-bottom: 3rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 2px solid #edf2f7;
       }
 
       h1 {
-        color: #0a58ca;
-        font-size: clamp(2rem, 5vw, 3rem);
-        font-weight: 800;
+        color: #0969da; /* Classic "Link Blue" but punchier */
+        font-size: clamp(2.5rem, 6vw, 3.5rem);
+        font-weight: 900;
+        letter-spacing: -1px;
         margin-bottom: 0.5rem;
       }
 
       .lead {
         color: #57606a;
-        font-size: 1.1rem;
+        font-size: 1.2rem;
         max-width: 65ch;
+        font-style: italic;
       }
 
       .labs {
         list-style: none;
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 1.25rem;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
       }
 
       .card {
         border: 1px solid #d0d7de;
-        border-radius: 12px;
-        padding: 1.35rem 1.5rem;
-        background: #fafbfc;
+        border-radius: 16px;
+        padding: 2rem;
+        background: #f6f8fa; /* Subtle off-white/gray */
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
-        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        gap: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
       }
 
       .card:hover {
-        border-color: #1f6feb;
-        box-shadow: 0 4px 14px rgba(31, 111, 235, 0.12);
+        transform: translateY(-5px);
+        border-color: #0969da;
+        background: #ffffff;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
       }
 
-      .card-lab {
-        font-size: 0.85rem;
-        font-weight: 700;
+      .card-number {
+        font-size: 0.8rem;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: #6f42c1;
+        letter-spacing: 0.08em;
+        color: #0969da;
+        background: #ddf4ff;
+        padding: 4px 10px;
+        border-radius: 20px;
+        align-self: flex-start;
       }
 
       .card h2 {
-        color: #0b0f14;
-        font-size: 1.25rem;
+        color: #1f2328;
+        font-size: 1.5rem;
         font-weight: 700;
-        margin: 0;
       }
 
       .card p {
         color: #57606a;
-        font-size: 0.98rem;
+        font-size: 1rem;
         flex-grow: 1;
       }
 
       .card a {
         align-self: flex-start;
         display: inline-block;
-        margin-top: 0.25rem;
-        color: #0a58ca;
+        background: #1f883d; /* "Go" Green */
+        color: #ffffff;
         text-decoration: none;
         font-weight: 600;
-        padding: 0.5rem 0;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        transition: background 0.2s;
       }
 
       .card a:hover {
-        text-decoration: underline;
-      }
-
-      .card a:focus-visible {
-        outline: 2px solid #1f6feb;
-        outline-offset: 2px;
-        border-radius: 4px;
+        background: #1a7f37;
+        box-shadow: 0 4px 8px rgba(31, 136, 61, 0.2);
       }
 
       footer {
-        margin-top: 3rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid #d0d7de;
+        margin-top: 5rem;
+        text-align: center;
         font-size: 0.9rem;
-        color: #57606a;
+        color: #6e7781;
+        border-top: 1px solid #edf2f7;
+        padding-top: 2rem;
       }
 
-      footer code {
-        background: #f3f4f6;
-        color: #b91c1c;
-        padding: 0.15rem 0.45rem;
-        border-radius: 6px;
-        font-family: "Fira Code", "Consolas", monospace;
-        font-size: 0.9em;
+      .ps-line {
+        color: #cf222e;
+        font-weight: 600;
+        display: block;
+        margin-top: 0.5rem;
+      }
+
+      .emoji-span {
+        font-style: normal;
+      }
+
+      /* Teaser card: light blur on copy only; button stays clear */
+      .card--secret .card-secret-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        filter: blur(8px);
+        user-select: none;
+        pointer-events: none;
+        -webkit-user-select: none;
+      }
+
+      .card-fake-locked {
+        align-self: flex-start;
+        display: inline-block;
+        background: #30363d;
+        color: #ffffff;
+        font-weight: 600;
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        cursor: not-allowed;
       }
     </style>
   </head>
   <body>
     <header>
-      <h1>AAST Labs</h1>
+      <h1>AAST Labs <span class="emoji-span">👨‍💻</span></h1>
       <p class="lead">
-        Pick a lab below. Each page is a standalone guide you can open on any
-        device—useful for class demos and practice at home.
+        Pick a lab below. Each one is a self-contained guide you can open
+        anywhere, whether you're in class, at home, or pretending to study.
       </p>
     </header>
 
@@ -136,22 +167,49 @@
       <ul class="labs" role="list">
         <li>
           <article class="card">
-            <span class="card-lab">Lab 7</span>
+            <span class="card-number">Lab 7</span>
             <h2>Pointers in C</h2>
-            <p>
-              Lab guide covering pointers, addresses, and how they work in C.
-            </p>
+            <p>Addresses, dereferencing, and other ways to make you cry.</p>
             <a href="lab7.html">Open Lab →</a>
           </article>
         </li>
-        <!-- Add new labs: duplicate the <li> block and point href to labN.html -->
+
+        <li>
+          <article
+            class="card card--secret"
+            aria-label="Lab 8 — coming later. Open lab is locked for now."
+          >
+            <span class="card-number">Lab 8</span>
+            <div class="card-secret-body" aria-hidden="true">
+              <h2>Dummy Lab</h2>
+              <p>If you can read this, you're probably smart (probably).</p>
+            </div>
+            <span class="card-fake-locked">Locked 🔒</span>
+          </article>
+        </li>
       </ul>
     </main>
 
-    <footer>
-      <p>
-        Tip: when this repo is on GitHub Pages, the site root is this
-        <code>index.html</code>. Add a new HTML file and a matching card above.
+    <footer
+      style="
+        margin-top: 4rem;
+        text-align: center;
+        border-top: 1px solid #30363d;
+        padding-top: 2rem;
+      "
+    >
+      <p style="color: #8b949e; font-size: 0.9rem">
+        Made with ❤️ <br />
+        <span
+          style="
+            color: #ff7b72;
+            font-style: italic;
+            margin-top: 0.5rem;
+            display: block;
+          "
+        >
+          P.S. If it doesn't work, try asking the AI to 'think harder.'
+        </span>
       </p>
     </footer>
   </body>
