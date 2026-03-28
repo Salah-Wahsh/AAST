@@ -518,7 +518,7 @@ printf("%d\\n", *ptr);    // 99     (same thing)
 
 ---
 
-### NOW Solve the Swap Problem
+### NOW Solve the Swap Problem (More on that next week)
 
 \`\`\`c
 void swap(int *a, int *b) {
@@ -547,20 +547,6 @@ printf("arr = %p\\n", arr);         // address of first element
 printf("&arr[0] = %p\\n", &arr[0]); // SAME address!
 \`\`\`
 
-> **"When you pass an array to a function, you're actually passing a POINTER to its first element."**
-
-\`\`\`c
-void changeFirst(int *arr) {
-    arr[0] = 999;
-}
-
-int main() {
-    int nums[] = {1, 2, 3};
-    changeFirst(nums);
-    printf("%d\\n", nums[0]);    // 999
-    return 0;
-}
-\`\`\`
 
 ---
 
@@ -675,50 +661,37 @@ printf("x=%d y=%d\\n", x, y);
 
 ---
 
-### Core Practice (Medium)
+### Core Practice
 
-**4.** Write a function \`void doubleValue(int *n)\` that doubles the value pointed to:
+**4.** Use a pointer to double the value of a variable without using the variable's name directly after the initial assignment.
 
 \`\`\`c
 int main() {
     int num = 5;
-    doubleValue(&num);
-    printf("%d\\n", num);  // should print 10
+    int *p = &num;
+
+    // Your code here...
+
+    printf("%d", num);  // Expected Output: 10
     return 0;
 }
 \`\`\`
 
 <!--ANSWER_4-->
 
-**5.** Write a function \`void swap(int *a, int *b)\` — implement swap. Test it in main.
+**5.** Swap the contents of two variables using only their pointers and a temporary integer.
 
 <!--ANSWER_5-->
 
-**6.** Write a function \`void getMinMax(int arr[], int size, int *min, int *max)\` that finds both min and max in ONE function:
-
-\`\`\`c
-int main() {
-    int arr[] = {3, 7, 1, 9, 4};
-    int min, max;
-    getMinMax(arr, 5, &min, &max);
-    printf("Min=%d, Max=%d\\n", min, max); // Min=1, Max=9
-    return 0;
-}
-\`\`\`
-
-> **KEY insight:** A function can only \`return\` ONE value. With pointers, it can "return" MULTIPLE values through parameters.
+**6.** Find both min and max values in an array using pointers.
 
 <!--ANSWER_6-->
-
-**7.** Write a function \`void reverseArray(int *arr, int size)\` using pointer notation to reverse an array in place.
-
-<!--ANSWER_7-->
 
 ---
 
 ### Challenge
 
-**8. Pointer arithmetic:**
+**7. Pointer arithmetic:**
 
 \`\`\`c
 int arr[] = {10, 20, 30, 40, 50};
@@ -734,7 +707,7 @@ printf("%d\\n", *ptr);       // ?
 
 ---
 
-## 6. Visual Summary
+## Visual Summary
 
 \`\`\`
 ╔══════════════════════════════════════════════════════╗
@@ -811,14 +784,11 @@ printf("%d\\n", *ptr);    // ✅ prints 42</code></pre>
         ANSWER_4: {
           title: "Answer — Problem 4",
           content: `
-<pre><code class="language-c">void doubleValue(int *n) {
-    *n = *n * 2;    // go to the address, read the value, double it, write it back
-}
-
-int main() {
+<pre><code class="language-c">int main() {
     int num = 5;
-    doubleValue(&num);       // pass the ADDRESS of num
-    printf("%d\\n", num);     // prints 10 ✅
+    int *p = &ampnum;
+    *p = (*p) * 2;
+    printf("%d", num); // 10 ✅
     return 0;
 }</code></pre>
 <p><strong>Key point:</strong> <code>*n = *n * 2</code> — the right side reads the value, multiplies by 2, then the left side writes it back to the same address.</p>
@@ -827,86 +797,83 @@ int main() {
         ANSWER_5: {
           title: "Answer — Problem 5",
           content: `
-<pre><code class="language-c">void swap(int *a, int *b) {
-    int temp = *a;   // save value at address a
-    *a = *b;         // put value at address b into address a
-    *b = temp;       // put saved value into address b
-}
+<pre><code class="language-c">#include &lt;stdio.h&gt;
 
 int main() {
-    int x = 5, y = 10;
-    swap(&x, &y);
-    printf("x=%d, y=%d\\n", x, y);  // x=10, y=5 ✅
+    int x = 10, y = 20;
+    int *px = &amp;x;
+    int *py = &amp;y;
+    int temp;
+
+    // Swap using only the pointers
+    temp = *px;   
+    *px = *py;    
+    *py = temp;   
+
+    printf("x: %d, y: %d\\n", x, y); 
     return 0;
 }</code></pre>
 <p><strong>Trace:</strong></p>
 <ul>
-  <li><code>temp = *a</code> → temp = 5</li>
-  <li><code>*a = *b</code> → x becomes 10</li>
-  <li><code>*b = temp</code> → y becomes 5</li>
+  <li><code>temp = *px</code> → temp gets value of x (10)</li>
+  <li><code>*px = *py</code> → x gets value of y (20)</li>
+  <li><code>*py = temp</code> → y gets value stored in temp (10)</li>
 </ul>
 `,
         },
         ANSWER_6: {
           title: "Answer — Problem 6",
           content: `
-<pre><code class="language-c">void getMinMax(int arr[], int size, int *min, int *max) {
-    *min = arr[0];
-    *max = arr[0];
-    for (int i = 1; i < size; i++) {
-        if (arr[i] < *min) {
-            *min = arr[i];
-        }
-        if (arr[i] > *max) {
-            *max = arr[i];
-        }
-    }
-}
+<pre><code class="language-c"><pre><code class="language-c">#include &lt;stdio.h&gt;
 
 int main() {
     int arr[] = {3, 7, 1, 9, 4};
-    int min, max;
-    getMinMax(arr, 5, &min, &max);
-    printf("Min=%d, Max=%d\\n", min, max);  // Min=1, Max=9 ✅
+    int n = 5;
+    int *min_ptr, *max_ptr;
+
+    min_ptr = &amp;arr[0];
+    max_ptr = &amp;arr[0];
+
+    for(int i = 1; i &lt; n; i++) {
+        if(arr[i] &lt; *min_ptr) {
+            min_ptr = &amp;arr[i]; 
+        }
+        if(arr[i] &gt; *max_ptr) {
+            max_ptr = &amp;arr[i];
+        }
+    }
+
+    printf("Min=%d, Max=%d\\n", *min_ptr, *max_ptr); 
     return 0;
-}</code></pre>
+}</code></pre></code></pre>
 <p><strong>Why pointers here?</strong> A function can only <code>return</code> ONE value. But we need TWO results (min AND max). Pointers let us "return" multiple values by writing directly to the caller's variables.</p>
 `,
         },
         ANSWER_7: {
           title: "Answer — Problem 7",
           content: `
-<pre><code class="language-c">#include <stdio.h>
-
-void reverseArray(int arr[], int size) {
-    int left = 0;
-    int right = size - 1;
-    while (left < right) {
-        // swap arr[left] and arr[right] using array notation
-        int temp = arr[left];
-        arr[left] = arr[right];
-        arr[right] = temp;
-        left++;
-        right--;
-    }
-}
+<pre><code class="language-c">#include &lt;stdio.h&gt;
 
 int main() {
-    int nums[] = {1, 2, 3, 4, 5};
-    int size = 5;
+    int arr[] = {1, 2, 3, 4, 5};
+    int n = 5;
+    int *start = arr;          
+    int *end = arr + (n - 1);  
+    int temp;
 
-    printf("Before: ");
-    for (int i = 0; i < size; i++) printf("%d ", nums[i]);
-    printf("\n");
+    while(start &lt; end) {
+        temp = *start;
+        *start = *end;
+        *end = temp;
 
-    reverseArray(nums, size);
+        start++; 
+        end--;
+    }
 
-    printf("After:  ");
-    for (int i = 0; i < size; i++) printf("%d ", nums[i]);
-    printf("\n");
-    // Output: 5 4 3 2 1 ✅
+    for(int i = 0; i &lt; n; i++) printf("%d ", arr[i]);
+    printf("\\n");
     return 0;
-}</code></pre>
+}</code></pre></code></pre>
 <p><strong>Note:</strong> <code>*(arr + i)</code> is the same as <code>arr[i]</code>. Both work! Using pointer notation here to practice.</p>
 `,
         },
