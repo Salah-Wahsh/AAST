@@ -1,0 +1,1735 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Call by Reference — Lab Guide</title>
+
+    <!-- Prism.js Theme -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Inter", "Segoe UI", Arial, sans-serif;
+        background: #ffffff;
+        color: #0b0f14;
+        line-height: 1.8;
+        font-size: 22px;
+        padding: 3rem;
+        max-width: 1100px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: #0a58ca;
+        font-size: 3rem;
+        font-weight: 800;
+        border-bottom: 3px solid #d0d7de;
+        padding-bottom: 0.6rem;
+        margin: 2.5rem 0 1.5rem;
+      }
+      h2 {
+        color: #1f6feb;
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 2.5rem 0 1.2rem;
+      }
+      h3 {
+        color: #6f42c1;
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin: 2rem 0 0.8rem;
+      }
+      h4 {
+        color: #b45309;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 1.5rem 0 0.5rem;
+      }
+      p {
+        margin: 1rem 0;
+        max-width: 75ch;
+      }
+      a {
+        color: #0a58ca;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      strong {
+        color: #000;
+        font-weight: 700;
+      }
+
+      :not(pre) > code {
+        background: #f3f4f6;
+        color: #b91c1c;
+        padding: 0.2rem 0.5rem;
+        border-radius: 6px;
+        font-family: "Fira Code", "Consolas", monospace;
+        font-size: 0.95em;
+        font-weight: 500;
+      }
+
+      pre {
+        border-radius: 10px;
+        padding: 1.5rem;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        font-size: 0.95em;
+        line-height: 1.7;
+      }
+
+      pre code {
+        background: none !important;
+        color: inherit;
+        padding: 0;
+        font-family: "Fira Code", "Consolas", monospace;
+      }
+
+      blockquote {
+        border-left: 6px solid #1f6feb;
+        background: #eef4ff;
+        padding: 1rem 1.4rem;
+        margin: 1.5rem 0;
+        border-radius: 0 10px 10px 0;
+        font-size: 1.05em;
+      }
+      blockquote p {
+        margin: 0.4rem 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        font-size: 0.95em;
+      }
+      th {
+        background: #eef4ff;
+        color: #0a58ca;
+        text-align: left;
+        padding: 0.9rem 1.2rem;
+        border: 1px solid #d0d7de;
+        font-weight: 700;
+      }
+      td {
+        padding: 0.8rem 1.2rem;
+        border: 1px solid #d0d7de;
+      }
+      tr:nth-child(even) {
+        background: #f9fafb;
+      }
+
+      ul,
+      ol {
+        padding-left: 2rem;
+        margin: 1rem 0;
+      }
+      li {
+        margin: 0.6rem 0;
+      }
+      hr {
+        border: none;
+        border-top: 2px solid #d0d7de;
+        margin: 2.5rem 0;
+      }
+
+      #sidebar {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        background: #ffffff;
+        border: 1px solid #d0d7de;
+        border-radius: 10px;
+        padding: 1.2rem;
+        max-width: 280px;
+        max-height: 90vh;
+        overflow-y: auto;
+        font-size: 0.9rem;
+        z-index: 100;
+        display: none;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      }
+      #sidebar.open {
+        display: block;
+      }
+      #sidebar a {
+        display: block;
+        padding: 0.3rem 0;
+        color: #444;
+      }
+      #sidebar a:hover {
+        color: #0a58ca;
+      }
+
+      #toggle-btn {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 200;
+        background: #16a34a;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+      #toggle-btn:hover {
+        background: #15803d;
+      }
+
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 4px solid #0a58ca;
+        padding-bottom: 1rem;
+        margin-bottom: 2.5rem;
+      }
+      .header-info h1 {
+        margin: 0;
+        border: none;
+        font-size: 2.2rem;
+        color: #000;
+      }
+      .header-info p {
+        margin: 0;
+        color: #444;
+        font-weight: 600;
+        font-size: 1.1rem;
+      }
+      .aast-logo {
+        height: 150px;
+        width: auto;
+      }
+
+      .answer-toggle {
+        display: inline-block;
+        background: #16a34a;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1.2rem;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin: 0.8rem 0 0.2rem;
+        transition: background 0.2s;
+      }
+      .answer-toggle:hover {
+        background: #15803d;
+      }
+      .answer-toggle.revealed {
+        background: #dc2626;
+      }
+      .answer-toggle.revealed:hover {
+        background: #b91c1c;
+      }
+
+      .answer-block {
+        display: none;
+        background: #f0fdf4;
+        border-left: 6px solid #16a34a;
+        border-radius: 0 10px 10px 0;
+        padding: 1rem 1.4rem;
+        margin: 0.5rem 0 1.5rem;
+        animation: fadeIn 0.3s ease;
+      }
+      .answer-block.visible {
+        display: block;
+      }
+      .answer-block h4 {
+        color: #16a34a;
+        margin: 0 0 0.5rem 0;
+      }
+      .answer-block pre {
+        margin: 0.8rem 0;
+      }
+      .answer-block p {
+        margin: 0.4rem 0;
+      }
+
+      .sneak-peek {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: 2px solid #f59e0b;
+        border-radius: 12px;
+        padding: 1.5rem 2rem;
+        margin: 2rem 0;
+      }
+      .sneak-peek h2 {
+        color: #b45309;
+        margin-top: 0;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-5px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media print {
+        body {
+          background: #fff;
+          color: #000;
+          font-size: 14pt;
+        }
+        pre {
+          background: #f3f4f6 !important;
+          color: #000 !important;
+          border: 1px solid #ccc;
+        }
+        :not(pre) > code {
+          background: #f3f4f6;
+          color: #b91c1c;
+        }
+        #sidebar,
+        #toggle-btn {
+          display: none !important;
+        }
+        .answer-block {
+          display: block !important;
+        }
+        .answer-toggle {
+          display: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header-container">
+      <div class="header-info">
+        <h1>Salah Wahsh</h1>
+        <p>Teaching Assistant</p>
+        <p>Arab Academy for Science, Technology & Maritime Transport</p>
+      </div>
+      <img
+        src="https://aast.edu/template/en/colleges-all/img/logo-blue03.webp"
+        alt="AAST Logo"
+        class="aast-logo"
+      />
+    </header>
+
+    <button id="toggle-btn" onclick="toggleNav()">☰ Nav</button>
+    <div id="sidebar"></div>
+    <div id="content"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+
+    <script>
+      const md = `
+# Call by Reference in C
+
+---
+
+## 1. Quick Review: Call by Value
+
+Last week you learned that C passes **copies** of values to functions:
+
+\`\`\`c
+void addTen(int x) {
+    x = x + 10;
+    printf("Inside: x = %d\\n", x);   // 15
+}
+
+int main() {
+    int num = 5;
+    addTen(num);
+    printf("Main: num = %d\\n", num);  // still 5!
+    return 0;
+}
+\`\`\`
+
+\`\`\`
+Inside: x = 15
+Main: num = 5          ← didn't change!
+\`\`\`
+
+\`\`\`
+Call by Value = I photocopy my paper and give you the COPY.
+               You scribble on the copy.
+               My original paper is untouched.
+\`\`\`
+
+---
+
+## 2. Call by Reference — The Main Event
+
+Instead of passing the **value**, we pass the **address** using pointers.
+
+Now the function can reach the **original variable** and modify it.
+
+\`\`\`c
+void addTen(int *x) {          // receives an ADDRESS
+    *x = *x + 10;              // go TO that address and change the value
+    printf("Inside: *x = %d\\n", *x);   // 15
+}
+
+int main() {
+    int num = 5;
+    addTen(&num);               // pass the ADDRESS of num
+    printf("Main: num = %d\\n", num);    // 15! ✅
+    return 0;
+}
+\`\`\`
+
+\`\`\`
+Inside: *x = 15
+Main: num = 15         ← IT CHANGED! ✅
+\`\`\`
+
+\`\`\`
+Call by Reference = I give you my HOME ADDRESS.
+                    You GO to my house and move the furniture.
+                    When I come home, everything is different.
+\`\`\`
+
+---
+
+## 3. Side-by-Side: Value vs Reference
+
+### In Memory
+
+#### Call by VALUE:
+
+\`\`\`
+main()                      addTen()
+┌──────────────┐           ┌──────────────┐
+│ num = 5      │  COPY →   │ x = 5        │  ← DIFFERENT box
+│ addr: 0x1000 │           │ addr: 0x2000 │
+└──────────────┘           └──────────────┘
+                           x = x + 10;
+                           x = 15  ← only the copy changes
+
+After return:
+num = 5  ← UNCHANGED
+\`\`\`
+
+#### Call by REFERENCE:
+
+\`\`\`
+main()                      addTen()
+┌──────────────┐           ┌──────────────┐
+│ num = 5      │ ◄──────── │ x = 0x1000   │  ← points to num!
+│ addr: 0x1000 │           │ addr: 0x2000 │
+└──────────────┘           └──────────────┘
+                           *x = *x + 10;
+                           goes to 0x1000, changes 5 → 15
+
+After return:
+num = 15 ← CHANGED ✅
+\`\`\`
+
+### Code Side-by-Side
+
+\`\`\`c
+// ═══════════════════════════════════════════════
+//  CALL BY VALUE              CALL BY REFERENCE
+// ═══════════════════════════════════════════════
+void addV(int x) {          void addR(int *x) {
+    x = x + 10;                 *x = *x + 10;
+}                            }
+
+int main() {                 int main() {
+    int n = 5;                   int n = 5;
+    addV(n);                     addR(&n);
+    printf("%d", n); // 5        printf("%d", n); // 15
+}                            }
+\`\`\`
+
+| | Call by Value | Call by Reference |
+|---|---|---|
+| **What's passed** | A copy of the value | The address of the variable |
+| **Parameter** | \`int x\` | \`int *x\` |
+| **How you call** | \`func(num)\` | \`func(&num)\` |
+| **Modify original?** | ❌ No | ✅ Yes |
+| **Inside function** | Use \`x\` directly | Use \`*x\` to access |
+
+---
+
+## 4. The Classic: Swap
+
+### ❌ Broken swap (call by value):
+
+\`\`\`c
+void brokenSwap(int a, int b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+int main() {
+    int x = 5, y = 10;
+    brokenSwap(x, y);
+    printf("x=%d, y=%d\\n", x, y);  // x=5, y=10 ❌
+    return 0;
+}
+\`\`\`
+
+### ✅ Working swap (call by reference):
+
+\`\`\`c
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int main() {
+    int x = 5, y = 10;
+    swap(&x, &y);
+    printf("x=%d, y=%d\\n", x, y);  // x=10, y=5 ✅
+    return 0;
+}
+\`\`\`
+
+### Trace:
+
+\`\`\`
+BEFORE:  x = 5 (0x1000)    y = 10 (0x1004)
+         a = 0x1000         b = 0x1004
+
+Step 1:  temp = *a          → temp = 5
+Step 2:  *a = *b            → x = 10
+Step 3:  *b = temp          → y = 5
+
+AFTER:   x = 10 ✅           y = 5 ✅
+\`\`\`
+
+---
+
+## 5. Arrays and Call by Reference
+
+### The Truth: Arrays Are ALWAYS Passed by Reference
+
+You've been using call by reference since week 2 — you just didn't know it.
+
+\`\`\`c
+void fillWithZeros(int arr[], int size) {
+    for (int i = 0; i < size; i++) {
+        arr[i] = 0;
+    }
+}
+
+int main() {
+    int nums[] = {5, 10, 15, 20};
+    fillWithZeros(nums, 4);
+    // nums is now {0, 0, 0, 0} — the ORIGINAL changed!
+    for (int i = 0; i < 4; i++) printf("%d ", nums[i]);
+    return 0;
+}
+\`\`\`
+
+> **Why?** When you write \`int arr[]\` in a parameter, C secretly converts it to \`int *arr\`. The array name IS already an address. No \`&\` needed!
+
+\`\`\`c
+// These three are EXACTLY the same:
+void func(int arr[], int size)     // looks like array
+void func(int *arr, int size)      // looks like pointer
+void func(int arr[100], int size)  // the 100 is ignored!
+\`\`\`
+
+### Proof: Array name IS an address
+
+\`\`\`c
+int arr[] = {10, 20, 30};
+printf("arr     = %p\\n", arr);       // 0x1000
+printf("&arr[0] = %p\\n", &arr[0]);   // 0x1000  ← SAME!
+\`\`\`
+
+> **That's why you never write \`&arr\` when passing arrays — \`arr\` is already the address.**
+
+---
+
+### Why \`sizeof\` Lies Inside Functions
+
+\`\`\`c
+void printSize(int arr[]) {
+    printf("Inside function: %lu\\n", sizeof(arr));   // 8 (size of a pointer!)
+}
+
+int main() {
+    int nums[] = {1, 2, 3, 4, 5};
+    printf("In main: %lu\\n", sizeof(nums));           // 20 (5 ints × 4 bytes)
+    printSize(nums);
+    return 0;
+}
+\`\`\`
+
+\`\`\`
+In main: 20
+Inside function: 8
+\`\`\`
+
+> **Inside the function, the array has decayed to a pointer.** A pointer is always 8 bytes (on 64-bit systems). The size information is LOST. That's why we ALWAYS pass \`size\` as a separate parameter.
+
+---
+
+### Modifying Arrays Through Functions
+
+#### Example: Scale all elements
+
+\`\`\`c
+void scaleArray(int *arr, int size, int factor) {
+    for (int i = 0; i < size; i++) {
+        arr[i] = arr[i] * factor;    // modifies ORIGINAL
+    }
+}
+
+int main() {
+    int grades[] = {70, 85, 90, 60, 75};
+    scaleArray(grades, 5, 2);
+    // grades is now {140, 170, 180, 120, 150}
+    for (int i = 0; i < 5; i++) printf("%d ", grades[i]);
+    return 0;
+}
+\`\`\`
+
+#### Example: Remove negative values (set to 0)
+
+\`\`\`c
+void removeNegatives(int arr[], int size) {
+    for (int i = 0; i < size; i++) {
+        if (arr[i] < 0) {
+            arr[i] = 0;
+        }
+    }
+}
+
+int main() {
+    int data[] = {5, -3, 8, -1, 4, -7};
+    removeNegatives(data, 6);
+    // data is now {5, 0, 8, 0, 4, 0}
+    for (int i = 0; i < 6; i++) printf("%d ", data[i]);
+    return 0;
+}
+\`\`\`
+
+---
+
+## 6. Combining Pointers + Arrays — Powerful Patterns
+
+### Pattern 1: Return multiple results from array processing
+
+\`\`\`c
+void analyzeArray(int arr[], int size, int *sum, float *avg, int *min, int *max) {
+    *sum = 0;
+    *min = arr[0];
+    *max = arr[0];
+
+    for (int i = 0; i < size; i++) {
+        *sum += arr[i];
+        if (arr[i] < *min) *min = arr[i];
+        if (arr[i] > *max) *max = arr[i];
+    }
+
+    *avg = (float)(*sum) / size;
+}
+
+int main() {
+    int arr[] = {4, 8, 2, 10, 6};
+    int sum, min, max;
+    float avg;
+    analyzeArray(arr, 5, &sum, &avg, &min, &max);
+    printf("Sum=%d Avg=%.2f Min=%d Max=%d\\n", sum, avg, min, max);
+    // Sum=30 Avg=6.00 Min=2 Max=10
+    return 0;
+}
+\`\`\`
+
+> **ONE function, FOUR results.** The array is passed by reference (automatically). The result variables are passed by reference (using \`&\`).
+
+---
+
+### Pattern 2: Function returns status, pointer returns result
+
+\`\`\`c
+int findElement(int arr[], int size, int target, int *index) {
+    for (int i = 0; i < size; i++) {
+        if (arr[i] == target) {
+            *index = i;
+            return 1;     // found!
+        }
+    }
+    return 0;             // not found
+}
+
+int main() {
+    int arr[] = {10, 20, 30, 40, 50};
+    int pos;
+
+    if (findElement(arr, 5, 30, &pos)) {
+        printf("Found at index %d\\n", pos);    // Found at index 2
+    } else {
+        printf("Not found\\n");
+    }
+
+    if (findElement(arr, 5, 99, &pos)) {
+        printf("Found at index %d\\n", pos);
+    } else {
+        printf("Not found\\n");                 // Not found
+    }
+    return 0;
+}
+\`\`\`
+
+> **This pattern is used EVERYWHERE in professional C code.** \`return\` = success/fail. Pointer = actual result.
+
+---
+
+### Pattern 3: Building output arrays
+
+\`\`\`c
+void getPassingStudents(int grades[], int size, int passing[], int *passCount) {
+    *passCount = 0;
+    for (int i = 0; i < size; i++) {
+        if (grades[i] >= 50) {
+            passing[*passCount] = grades[i];
+            (*passCount)++;    // parentheses matter!
+        }
+    }
+}
+
+int main() {
+    int grades[] = {85, 30, 72, 45, 91, 60, 38};
+    int passing[7];
+    int count;
+
+    getPassingStudents(grades, 7, passing, &count);
+
+    printf("Passing students: %d\\n", count);   // 4
+    for (int i = 0; i < count; i++) {
+        printf("%d ", passing[i]);              // 85 72 91 60
+    }
+    return 0;
+}
+\`\`\`
+
+> **Watch out:** \`(*passCount)++\` is NOT the same as \`*passCount++\`
+> - \`(*passCount)++\` → increment the VALUE at the address ✅
+> - \`*passCount++\` → increment the POINTER, then dereference ❌
+
+---
+
+## 7. 2D Arrays and Call by Reference
+
+### Passing 2D Arrays to Functions
+
+\`\`\`c
+void printMatrix(int rows, int cols, int matrix[rows][cols]) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            printf("%3d ", matrix[i][j]);
+        }
+        printf("\\n");
+    }
+}
+
+int main() {
+    int mat[3][3] = {
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9}
+    };
+    printMatrix(3, 3, mat);
+    return 0;
+}
+\`\`\`
+
+> **2D arrays are also passed by reference!** The function can modify the original matrix.
+
+### Modifying a 2D Array
+
+\`\`\`c
+void doubleMatrix(int rows, int cols, int matrix[rows][cols]) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            matrix[i][j] *= 2;
+        }
+    }
+}
+
+int main() {
+    int mat[2][3] = {
+        {1, 2, 3},
+        {4, 5, 6}
+    };
+    doubleMatrix(2, 3, mat);
+    // mat is now {{2,4,6}, {8,10,12}} — ORIGINAL changed!
+
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 3; j++) printf("%d ", mat[i][j]);
+        printf("\\n");
+    }
+    return 0;
+}
+\`\`\`
+
+### Getting Row Sums with Pointers
+
+\`\`\`c
+void rowSums(int rows, int cols, int matrix[rows][cols], int sums[]) {
+    for (int i = 0; i < rows; i++) {
+        sums[i] = 0;
+        for (int j = 0; j < cols; j++) {
+            sums[i] += matrix[i][j];
+        }
+    }
+}
+
+int main() {
+    int mat[3][3] = {
+        {1, 2, 3},
+        {4, 5, 6},
+        {7, 8, 9}
+    };
+    int sums[3];
+    rowSums(3, 3, mat, sums);
+    for (int i = 0; i < 3; i++) {
+        printf("Row %d sum = %d\\n", i, sums[i]);
+    }
+    // Row 0 sum = 6
+    // Row 1 sum = 15
+    // Row 2 sum = 24
+    return 0;
+}
+\`\`\`
+
+---
+
+## 8. scanf — You've Been Doing This All Along
+
+\`\`\`c
+int age;
+scanf("%d", &age);     // & sends the ADDRESS so scanf can WRITE into age
+\`\`\`
+
+> **\`scanf\` is a function that uses call by reference.**
+
+**But wait — why no \`&\` for strings?**
+
+\`\`\`c
+char name[50];
+scanf("%s", name);     // no & needed!
+\`\`\`
+
+> Because \`name\` is an array, and arrays **already ARE addresses**.
+
+**Everything connects:**
+
+\`\`\`
+scanf("%d", &age)     →  &age is an address    → call by reference
+scanf("%s", name)     →  name IS an address     → call by reference
+func(arr, size)       →  arr IS an address      → call by reference
+func(&x)              →  &x is an address       → call by reference
+\`\`\`
+
+> **It's ALL the same concept. Every time you see \`&\` or an array name in a function call, you're looking at call by reference.**
+
+---
+
+## 9. Decision Guide — When to Use Which
+
+\`\`\`
+┌─────────────────────────────────────────────────────────────┐
+│                    DECISION GUIDE                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Does the function need to CHANGE the original variable?    │
+│     YES → Call by Reference  (int *x)  func(&var)           │
+│     NO  → Call by Value      (int x)   func(var)            │
+│                                                             │
+│  Does the function need to "return" MORE than one value?    │
+│     YES → Use pointers for the extra "returns"              │
+│     NO  → Normal return is fine                             │
+│                                                             │
+│  Are you passing an array?                                  │
+│     It's ALWAYS by reference automatically.                 │
+│     No & needed — array name IS an address.                 │
+│                                                             │
+│  Are you passing a single int/float/char?                   │
+│     Want to READ only → pass by value    (int x)            │
+│     Want to MODIFY    → pass by reference (int *x)          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+\`\`\`
+
+---
+
+## 10. Common Mistakes
+
+\`\`\`c
+// ❌ MISTAKE 1: Forgetting & when calling
+int x = 5;
+addTen(x);       // WRONG — passing value, not address
+addTen(&x);      // ✅ CORRECT
+
+// ❌ MISTAKE 2: Forgetting * in the parameter
+void addTen(int x) {    // WRONG — this is call by VALUE
+    x = x + 10;
+}
+void addTen(int *x) {   // ✅ CORRECT — this is call by reference
+    *x = *x + 10;
+}
+
+// ❌ MISTAKE 3: Forgetting * when accessing
+void addTen(int *x) {
+    x = x + 10;     // WRONG! Moves the POINTER, not the value
+    *x = *x + 10;   // ✅ Dereference to get/set value
+}
+
+// ❌ MISTAKE 4: Using & when passing arrays
+int arr[] = {1, 2, 3};
+func(&arr, 3);     // WRONG! arr is already an address
+func(arr, 3);      // ✅ CORRECT
+
+// ❌ MISTAKE 5: (*count)++ vs *count++
+(*count)++;     // ✅ increment the VALUE at the address
+*count++;       // ❌ increment the POINTER then dereference — NOT what you want
+\`\`\`
+
+---
+
+## 11. Practice Problems
+
+### Warm-Up: Predict the Output
+
+**1.** What's the output?
+
+\`\`\`c
+void mystery(int *a, int *b) {
+    *a = *a + *b;
+    *b = *a - *b;
+    *a = *a - *b;
+}
+
+int main() {
+    int x = 7, y = 3;
+    mystery(&x, &y);
+    printf("x=%d, y=%d\\n", x, y);
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_1-->
+
+**2.** What's the output?
+
+\`\`\`c
+void update(int *x, int *y) {
+    *x = *x * 2;
+    *y = *y * 3;
+    printf("Inside: %d %d\\n", *x, *y);
+}
+
+int main() {
+    int a = 5, b = 4;
+    update(&a, &b);
+    printf("Outside: %d %d\\n", a, b);
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_2-->
+
+**3.** What's the output? (Tricky!)
+
+\`\`\`c
+void change(int *p, int *q) {
+    *p = *p + 5;
+    *q = *q + 5;
+    printf("Step 1: %d %d\\n", *p, *q);
+    *p = *q;
+    printf("Step 2: %d %d\\n", *p, *q);
+}
+
+int main() {
+    int a = 10, b = 20;
+    change(&a, &b);
+    printf("Final: %d %d\\n", a, b);
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_3-->
+
+**4.** What's the output? (Both pointers point to the SAME variable!)
+
+\`\`\`c
+void bothSame(int *p, int *q) {
+    *p = *p + 10;
+    *q = *q + 20;
+}
+
+int main() {
+    int x = 5;
+    bothSame(&x, &x);      // passing same address TWICE!
+    printf("x = %d\\n", x);
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_4-->
+
+---
+
+### Core Practice: Fix the Bugs
+
+**5.** Fix ALL the bugs (there are 3):
+
+\`\`\`c
+void triple(int n) {
+    n = n * 3;
+}
+
+int main() {
+    int val = 10;
+    triple(val);
+    printf("%d\\n", val);  // should print 30
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_5-->
+
+**6.** Fix ALL the bugs:
+
+\`\`\`c
+void incrementAll(int arr[], int size) {
+    for (int i = 0; i <= size; i++) {
+        arr[i] = arr[i] + 1;
+    }
+}
+
+int main() {
+    int nums[] = {10, 20, 30};
+    incrementAll(&nums, 3);
+    for (int i = 0; i < 3; i++) printf("%d ", nums[i]);
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_6-->
+
+---
+
+### Core Practice: Write Functions
+
+**7.** Write a function \`void clamp(int *value, int min, int max)\` that forces a value into a range:
+
+\`\`\`c
+int main() {
+    int a = 150;
+    clamp(&a, 0, 100);
+    printf("%d\\n", a);  // 100
+
+    int b = -20;
+    clamp(&b, 0, 100);
+    printf("%d\\n", b);  // 0
+
+    int c = 50;
+    clamp(&c, 0, 100);
+    printf("%d\\n", c);  // 50 (already in range)
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_7-->
+
+**8.** Write a function \`void getCircleInfo(float radius, float *area, float *circumference)\`:
+
+\`\`\`c
+int main() {
+    float area, circ;
+    getCircleInfo(5.0, &area, &circ);
+    printf("Area: %.2f\\n", area);           // 78.54
+    printf("Circumference: %.2f\\n", circ);  // 31.42
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_8-->
+
+**9.** Write a function \`void sortTwo(int *a, int *b)\` that ensures \`*a <= *b\`. Then use it to sort three numbers:
+
+\`\`\`c
+int main() {
+    int x = 30, y = 10, z = 20;
+    // sort using sortTwo...
+    printf("%d %d %d\\n", x, y, z);  // 10 20 30
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_9-->
+
+---
+
+### Arrays + Pointers Combined
+
+**10.** Write \`void normalize(int *arr, int size)\` that subtracts the minimum from every element:
+
+\`\`\`c
+int main() {
+    int arr[] = {5, 9, 3, 7, 1};
+    normalize(arr, 5);
+    // arr becomes {4, 8, 2, 6, 0}
+    for (int i = 0; i < 5; i++) printf("%d ", arr[i]);
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_10-->
+
+**11.** Write \`void separateEvenOdd(int arr[], int size, int even[], int *evenCount, int odd[], int *oddCount)\`:
+
+\`\`\`c
+int main() {
+    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
+    int even[8], odd[8];
+    int ec, oc;
+    separateEvenOdd(arr, 8, even, &ec, odd, &oc);
+
+    printf("Even (%d): ", ec);
+    for (int i = 0; i < ec; i++) printf("%d ", even[i]);
+    printf("\\nOdd (%d): ", oc);
+    for (int i = 0; i < oc; i++) printf("%d ", odd[i]);
+    // Even (4): 2 4 6 8
+    // Odd (4): 1 3 5 7
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_11-->
+
+**12.** Write \`int safeDivide(int a, int b, float *result)\` that returns 1 on success, 0 if division by zero:
+
+\`\`\`c
+int main() {
+    float answer;
+    if (safeDivide(17, 5, &answer)) {
+        printf("17 / 5 = %.2f\\n", answer);   // 3.40
+    }
+    if (!safeDivide(10, 0, &answer)) {
+        printf("Cannot divide by zero!\\n");
+    }
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_12-->
+
+---
+
+### Challenge Problems
+
+**13.** Write \`void reverseArray(int arr[], int size)\` using swap with pointers:
+
+\`\`\`c
+int main() {
+    int arr[] = {1, 2, 3, 4, 5};
+    reverseArray(arr, 5);
+    for (int i = 0; i < 5; i++) printf("%d ", arr[i]);
+    // Output: 5 4 3 2 1
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_13-->
+
+**14.** Write \`void matrixRowSums(int rows, int cols, int mat[rows][cols], int sums[], int *maxRowIndex)\` that computes every row sum AND finds which row has the largest sum:
+
+\`\`\`c
+int main() {
+    int mat[3][4] = {
+        {1, 2, 3, 4},
+        {10, 20, 30, 40},
+        {5, 5, 5, 5}
+    };
+    int sums[3];
+    int maxRow;
+    matrixRowSums(3, 4, mat, sums, &maxRow);
+
+    for (int i = 0; i < 3; i++)
+        printf("Row %d sum = %d\\n", i, sums[i]);
+    printf("Largest row: %d\\n", maxRow);
+    // Row 0 sum = 10
+    // Row 1 sum = 100
+    // Row 2 sum = 20
+    // Largest row: 1
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_14-->
+
+**15.** Write \`void gradeReport(int grades[], int size, int *countA, int *countB, int *countC, int *countF)\` where A ≥ 90, B ≥ 80, C ≥ 70, F < 70:
+
+\`\`\`c
+int main() {
+    int grades[] = {95, 82, 67, 73, 91, 88, 55, 78, 99, 60};
+    int a, b, c, f;
+    gradeReport(grades, 10, &a, &b, &c, &f);
+    printf("A: %d, B: %d, C: %d, F: %d\\n", a, b, c, f);
+    // A: 3, B: 2, C: 2, F: 3
+    return 0;
+}
+\`\`\`
+
+<!--ANSWER_15-->
+
+---
+
+## 12. Visual Summary
+
+\`\`\`
+╔═══════════════════════════════════════════════════════════════╗
+║              CALL BY VALUE vs CALL BY REFERENCE               ║
+╠═══════════════════════════════════════════════════════════════╣
+║                                                               ║
+║  VALUE:                      REFERENCE:                       ║
+║  void f(int x)               void f(int *x)                  ║
+║  call: f(var)                call: f(&var)                    ║
+║  gets a COPY                 gets the ADDRESS                 ║
+║  original SAFE               original CHANGES                 ║
+║                                                               ║
+║  ARRAYS:                                                      ║
+║  void f(int arr[], int n)    ← ALWAYS by reference            ║
+║  call: f(arr, n)             ← no & needed                    ║
+║                                                               ║
+╠═══════════════════════════════════════════════════════════════╣
+║  WHEN TO USE REFERENCE:                                       ║
+║  • Function needs to MODIFY the original                      ║
+║  • Function needs to "return" MULTIPLE values                 ║
+║  • Passing large data (efficiency)                            ║
+║  • Arrays (automatic — no choice)                             ║
+╚═══════════════════════════════════════════════════════════════╝
+\`\`\`
+
+---
+
+<div class="sneak-peek">
+
+## 🔮 Sneak Peek: What's Coming Next Week — Recursion
+
+**A function that calls ITSELF.** That's the whole idea.
+
+\`\`\`c
+void countDown(int n) {
+    if (n == 0) {
+        printf("Go!\\n");
+        return;              // STOP here (base case)
+    }
+    printf("%d...\\n", n);
+    countDown(n - 1);        // call MYSELF with a smaller number
+}
+
+// countDown(3) prints:
+// 3...
+// 2...
+// 1...
+// Go!
+\`\`\`
+
+**Two rules you'll need to remember:**
+1. **Base case** — when to STOP (without this → infinite loop → crash)
+2. **Recursive case** — call yourself with a SMALLER problem
+
+**Classic example — factorial:**
+
+\`\`\`
+5! = 5 × 4 × 3 × 2 × 1 = 120
+
+Or think of it as:
+5! = 5 × 4!    ← calling itself with a smaller problem!
+\`\`\`
+
+\`\`\`c
+int factorial(int n) {
+    if (n <= 1) return 1;           // base case
+    return n * factorial(n - 1);    // recursive case
+}
+\`\`\`
+
+**That's all for now.** Next week we'll go deep into recursion, trace how it works step by step, and solve some cool problems with it. Come prepared!
+
+</div>
+
+`;
+
+      const answers = {
+        ANSWER_1: {
+          title: "Answer — Problem 1",
+          content: `
+<pre><code>x=3, y=7</code></pre>
+<p><strong>This is a swap WITHOUT a temp variable!</strong></p>
+<pre><code>Start:  x=7,  y=3
+
+*a = *a + *b    →  x = 7 + 3 = 10
+*b = *a - *b    →  y = 10 - 3 = 7
+*a = *a - *b    →  x = 10 - 7 = 3
+
+End:    x=3,  y=7  (swapped!)</code></pre>
+<p><strong>Cool trick!</strong> But the temp variable version is safer — this one can overflow with large numbers.</p>
+`,
+        },
+        ANSWER_2: {
+          title: "Answer — Problem 2",
+          content: `
+<pre><code>Inside: 10 12
+Outside: 10 12</code></pre>
+<p><strong>Explanation:</strong></p>
+<ul>
+  <li><code>*x = *x * 2</code> → a becomes 5 × 2 = <strong>10</strong></li>
+  <li><code>*y = *y * 3</code> → b becomes 4 × 3 = <strong>12</strong></li>
+  <li>Both use call by reference, so inside and outside print the <strong>same values</strong>.</li>
+</ul>
+`,
+        },
+        ANSWER_3: {
+          title: "Answer — Problem 3",
+          content: `
+<pre><code>Step 1: 15 25
+Step 2: 25 25
+Final: 25 25</code></pre>
+<p><strong>Trace:</strong></p>
+<pre><code>Start:    a = 10, b = 20
+
+*p = *p + 5    → a = 10 + 5 = 15
+*q = *q + 5    → b = 20 + 5 = 25
+Print Step 1:  15 25
+
+*p = *q        → a = 25  (a gets the value of b)
+Print Step 2:  25 25
+
+Final:         a = 25, b = 25</code></pre>
+<p><strong>Key:</strong> After <code>*p = *q</code>, both variables hold the SAME value. The original value of <code>a</code> (15) is lost.</p>
+`,
+        },
+        ANSWER_4: {
+          title: "Answer — Problem 4",
+          content: `
+<pre><code>x = 35</code></pre>
+<p><strong>Both p and q point to the SAME variable x!</strong></p>
+<pre><code>Start:  x = 5      p → x      q → x
+
+*p = *p + 10    → x = 5 + 10 = 15   (both p and q see 15 now)
+*q = *q + 20    → x = 15 + 20 = 35  (because *q is also x!)
+
+End:    x = 35</code></pre>
+<p><strong>Lesson:</strong> When two pointers point to the same variable, every change through either pointer affects the same memory. This is called <strong>aliasing</strong>.</p>
+`,
+        },
+        ANSWER_5: {
+          title: "Answer — Problem 5",
+          content: `
+<p><strong>Three bugs:</strong></p>
+<ol>
+  <li>Parameter: <code>int n</code> → <code>int *n</code></li>
+  <li>Body: <code>n = n * 3</code> → <code>*n = *n * 3</code></li>
+  <li>Call: <code>triple(val)</code> → <code>triple(&val)</code></li>
+</ol>
+<pre><code class="language-c">void triple(int *n) {        // ✅ pointer parameter
+    *n = *n * 3;              // ✅ dereference
+}
+
+int main() {
+    int val = 10;
+    triple(&val);             // ✅ pass address
+    printf("%d\\n", val);      // 30 ✅
+    return 0;
+}</code></pre>
+`,
+        },
+        ANSWER_6: {
+          title: "Answer — Problem 6",
+          content: `
+<p><strong>Two bugs:</strong></p>
+<ol>
+  <li><code>i <= size</code> → <code>i < size</code> (off-by-one! Goes out of bounds)</li>
+  <li><code>&nums</code> → <code>nums</code> (arrays are already addresses, no <code>&</code> needed)</li>
+</ol>
+<pre><code class="language-c">void incrementAll(int arr[], int size) {
+    for (int i = 0; i < size; i++) {    // ✅ < not <=
+        arr[i] = arr[i] + 1;
+    }
+}
+
+int main() {
+    int nums[] = {10, 20, 30};
+    incrementAll(nums, 3);               // ✅ no &
+    for (int i = 0; i < 3; i++) printf("%d ", nums[i]);
+    // Output: 11 21 31
+    return 0;
+}</code></pre>
+`,
+        },
+        ANSWER_7: {
+          title: "Answer — Problem 7",
+          content: `
+<pre><code class="language-c">void clamp(int *value, int min, int max) {
+    if (*value < min) {
+        *value = min;
+    } else if (*value > max) {
+        *value = max;
+    }
+    // if already in range, do nothing
+}
+
+int main() {
+    int a = 150;
+    clamp(&a, 0, 100);
+    printf("%d\\n", a);  // 100 ✅
+
+    int b = -20;
+    clamp(&b, 0, 100);
+    printf("%d\\n", b);  // 0 ✅
+
+    int c = 50;
+    clamp(&c, 0, 100);
+    printf("%d\\n", c);  // 50 ✅
+    return 0;
+}</code></pre>
+<p><strong>Note:</strong> <code>min</code> and <code>max</code> are passed by VALUE (we only read them). Only <code>value</code> needs to be a pointer because we MODIFY it.</p>
+`,
+        },
+        ANSWER_8: {
+          title: "Answer — Problem 8",
+          content: `
+<pre><code class="language-c">#define PI 3.14159265
+
+void getCircleInfo(float radius, float *area, float *circumference) {
+    *area = PI * radius * radius;
+    *circumference = 2 * PI * radius;
+}
+
+int main() {
+    float area, circ;
+    getCircleInfo(5.0, &area, &circ);
+    printf("Area: %.2f\\n", area);           // 78.54
+    printf("Circumference: %.2f\\n", circ);  // 31.42
+    return 0;
+}</code></pre>
+<p><strong>Pattern:</strong> <code>radius</code> = by value (read only). <code>area</code> and <code>circumference</code> = by reference (write results).</p>
+`,
+        },
+        ANSWER_9: {
+          title: "Answer — Problem 9",
+          content: `
+<pre><code class="language-c">void sortTwo(int *a, int *b) {
+    if (*a > *b) {
+        int temp = *a;
+        *a = *b;
+        *b = temp;
+    }
+}
+
+int main() {
+    int x = 30, y = 10, z = 20;
+
+    sortTwo(&x, &y);   // x=10, y=30, z=20
+    sortTwo(&y, &z);   // x=10, y=20, z=30
+    sortTwo(&x, &y);   // x=10, y=20, z=30 (already sorted)
+
+    printf("%d %d %d\\n", x, y, z);  // 10 20 30 ✅
+    return 0;
+}</code></pre>
+<p><strong>Why 3 calls?</strong> This is a <strong>bubble sort</strong> for 3 elements. You need to compare-and-swap pairs, then repeat to make sure everything settles.</p>
+`,
+        },
+        ANSWER_10: {
+          title: "Answer — Problem 10",
+          content: `
+<pre><code class="language-c">void normalize(int *arr, int size) {
+    // Step 1: find minimum
+    int min = arr[0];
+    for (int i = 1; i < size; i++) {
+        if (arr[i] < min) min = arr[i];
+    }
+
+    // Step 2: subtract min from every element
+    for (int i = 0; i < size; i++) {
+        arr[i] -= min;
+    }
+}
+
+int main() {
+    int arr[] = {5, 9, 3, 7, 1};
+    normalize(arr, 5);
+    for (int i = 0; i < 5; i++) printf("%d ", arr[i]);
+    // Output: 4 8 2 6 0
+    return 0;
+}</code></pre>
+<p><strong>No <code>&</code> needed</strong> when passing <code>arr</code> — arrays are already addresses! The function modifies the original directly.</p>
+`,
+        },
+        ANSWER_11: {
+          title: "Answer — Problem 11",
+          content: `
+<pre><code class="language-c">void separateEvenOdd(int arr[], int size, int even[], int *evenCount, int odd[], int *oddCount) {
+    *evenCount = 0;
+    *oddCount = 0;
+    for (int i = 0; i < size; i++) {
+        if (arr[i] % 2 == 0) {
+            even[*evenCount] = arr[i];
+            (*evenCount)++;
+        } else {
+            odd[*oddCount] = arr[i];
+            (*oddCount)++;
+        }
+    }
+}
+
+int main() {
+    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8};
+    int even[8], odd[8];
+    int ec, oc;
+    separateEvenOdd(arr, 8, even, &ec, odd, &oc);
+
+    printf("Even (%d): ", ec);
+    for (int i = 0; i < ec; i++) printf("%d ", even[i]);
+    printf("\\nOdd (%d): ", oc);
+    for (int i = 0; i < oc; i++) printf("%d ", odd[i]);
+    // Even (4): 2 4 6 8
+    // Odd (4): 1 3 5 7
+    return 0;
+}</code></pre>
+<p><strong>Critical:</strong> <code>(*evenCount)++</code> not <code>*evenCount++</code>! The parentheses ensure we increment the VALUE, not the pointer.</p>
+`,
+        },
+        ANSWER_12: {
+          title: "Answer — Problem 12",
+          content: `
+<pre><code class="language-c">int safeDivide(int a, int b, float *result) {
+    if (b == 0) {
+        return 0;    // failure
+    }
+    *result = (float)a / b;
+    return 1;        // success
+}
+
+int main() {
+    float answer;
+    if (safeDivide(17, 5, &answer)) {
+        printf("17 / 5 = %.2f\\n", answer);   // 3.40
+    }
+    if (!safeDivide(10, 0, &answer)) {
+        printf("Cannot divide by zero!\\n");
+    }
+    return 0;
+}</code></pre>
+<p><strong>Professional pattern:</strong> Return value = success/failure. Pointer parameter = actual result. You'll see this in file I/O, networking, and system programming.</p>
+`,
+        },
+        ANSWER_13: {
+          title: "Answer — Problem 13",
+          content: `
+<pre><code class="language-c">void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+void reverseArray(int arr[], int size) {
+    int left = 0;
+    int right = size - 1;
+    while (left < right) {
+        swap(&arr[left], &arr[right]);
+        left++;
+        right--;
+    }
+}
+
+int main() {
+    int arr[] = {1, 2, 3, 4, 5};
+    reverseArray(arr, 5);
+    for (int i = 0; i < 5; i++) printf("%d ", arr[i]);
+    // Output: 5 4 3 2 1
+    return 0;
+}</code></pre>
+<p><strong>Notice:</strong> We reused our <code>swap</code> function! We pass <code>&arr[left]</code> and <code>&arr[right]</code> — the addresses of specific array elements. Functions calling functions with pointers — that's real programming.</p>
+`,
+        },
+        ANSWER_14: {
+          title: "Answer — Problem 14",
+          content: `
+<pre><code class="language-c">void matrixRowSums(int rows, int cols, int mat[rows][cols], int sums[], int *maxRowIndex) {
+    *maxRowIndex = 0;
+
+    for (int i = 0; i < rows; i++) {
+        sums[i] = 0;
+        for (int j = 0; j < cols; j++) {
+            sums[i] += mat[i][j];
+        }
+        if (sums[i] > sums[*maxRowIndex]) {
+            *maxRowIndex = i;
+        }
+    }
+}
+
+int main() {
+    int mat[3][4] = {
+        {1, 2, 3, 4},
+        {10, 20, 30, 40},
+        {5, 5, 5, 5}
+    };
+    int sums[3];
+    int maxRow;
+    matrixRowSums(3, 4, mat, sums, &maxRow);
+
+    for (int i = 0; i < 3; i++)
+        printf("Row %d sum = %d\\n", i, sums[i]);
+    printf("Largest row: %d\\n", maxRow);
+    // Row 0 sum = 10
+    // Row 1 sum = 100
+    // Row 2 sum = 20
+    // Largest row: 1
+    return 0;
+}</code></pre>
+<p><strong>This combines everything:</strong> 2D array (by reference), 1D output array (by reference), and a single int result (pointer). All in one function.</p>
+`,
+        },
+        ANSWER_15: {
+          title: "Answer — Problem 15",
+          content: `
+<pre><code class="language-c">void gradeReport(int grades[], int size, int *countA, int *countB, int *countC, int *countF) {
+    *countA = 0;
+    *countB = 0;
+    *countC = 0;
+    *countF = 0;
+
+    for (int i = 0; i < size; i++) {
+        if (grades[i] >= 90) {
+            (*countA)++;
+        } else if (grades[i] >= 80) {
+            (*countB)++;
+        } else if (grades[i] >= 70) {
+            (*countC)++;
+        } else {
+            (*countF)++;
+        }
+    }
+}
+
+int main() {
+    int grades[] = {95, 82, 67, 73, 91, 88, 55, 78, 99, 60};
+    int a, b, c, f;
+    gradeReport(grades, 10, &a, &b, &c, &f);
+    printf("A: %d, B: %d, C: %d, F: %d\\n", a, b, c, f);
+    // A: 3, B: 2, C: 2, F: 3
+    return 0;
+}</code></pre>
+<p><strong>Trace:</strong></p>
+<pre><code>95 → A    82 → B    67 → F    73 → C    91 → A
+88 → B    55 → F    78 → C    99 → A    60 → F
+
+A: 3 (95, 91, 99)
+B: 2 (82, 88)
+C: 2 (73, 78)
+F: 3 (67, 55, 60)</code></pre>
+<p><strong>Don't forget:</strong> Always initialize the counts to 0 at the start! Without that, they'd hold garbage values.</p>
+`,
+        },
+      };
+
+      marked.setOptions({ gfm: true, breaks: false });
+
+      document.getElementById("content").innerHTML = marked.parse(md);
+
+      const contentEl = document.getElementById("content");
+      let html = contentEl.innerHTML;
+
+      for (const [key, ans] of Object.entries(answers)) {
+        const placeholder = "<!--" + key + "-->";
+        const replacement =
+          '<button class="answer-toggle" onclick="toggleAnswer(\'' +
+          key +
+          "', this)\">" +
+          "▶ Show Answer</button>" +
+          '<div class="answer-block" id="' +
+          key +
+          '">' +
+          "<h4>✅ " +
+          ans.title +
+          "</h4>" +
+          ans.content +
+          "</div>";
+        html = html.replace(placeholder, replacement);
+      }
+
+      contentEl.innerHTML = html;
+
+      Prism.highlightAll();
+
+      const headings = document.querySelectorAll(
+        "#content h1, #content h2, #content h3",
+      );
+      const sidebar = document.getElementById("sidebar");
+
+      let navHTML =
+        '<strong style="color:#0a58ca;">Navigation</strong><hr style="margin:0.5rem 0; border-color:#d0d7de;">';
+
+      headings.forEach((h, i) => {
+        h.id = "heading-" + i;
+        const indent =
+          h.tagName === "H3"
+            ? "padding-left:1rem;"
+            : h.tagName === "H1"
+              ? "font-weight:bold; color:#0a58ca;"
+              : "font-weight:600;";
+        navHTML +=
+          '<a href="#heading-' +
+          i +
+          '" style="' +
+          indent +
+          '">' +
+          h.textContent +
+          "</a>";
+      });
+
+      sidebar.innerHTML = navHTML;
+
+      function toggleAnswer(id, btn) {
+        const block = document.getElementById(id);
+        const isVisible = block.classList.contains("visible");
+        if (isVisible) {
+          block.classList.remove("visible");
+          btn.textContent = "▶ Show Answer";
+          btn.classList.remove("revealed");
+        } else {
+          block.classList.add("visible");
+          btn.textContent = "▼ Hide Answer";
+          btn.classList.add("revealed");
+          Prism.highlightAllUnder(block);
+        }
+      }
+
+      function toggleNav() {
+        sidebar.classList.toggle("open");
+      }
+
+      window.toggleAnswer = toggleAnswer;
+      window.toggleNav = toggleNav;
+    </script>
+  </body>
+</html>
