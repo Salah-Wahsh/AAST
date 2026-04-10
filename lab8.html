@@ -465,60 +465,10 @@ int main() {                 int main() {
 | **Modify original?** | ❌ No | ✅ Yes |
 | **Inside function** | Use \`x\` directly | Use \`*x\` to access |
 
----
-
-## 4. The Classic: Swap
-
-### ❌ Broken swap (call by value):
-
-\`\`\`c
-void brokenSwap(int a, int b) {
-    int temp = a;
-    a = b;
-    b = temp;
-}
-
-int main() {
-    int x = 5, y = 10;
-    brokenSwap(x, y);
-    printf("x=%d, y=%d\\n", x, y);  // x=5, y=10 ❌
-    return 0;
-}
-\`\`\`
-
-### ✅ Working swap (call by reference):
-
-\`\`\`c
-void swap(int *a, int *b) {
-    int temp = *a;
-    *a = *b;
-    *b = temp;
-}
-
-int main() {
-    int x = 5, y = 10;
-    swap(&x, &y);
-    printf("x=%d, y=%d\\n", x, y);  // x=10, y=5 ✅
-    return 0;
-}
-\`\`\`
-
-### Trace:
-
-\`\`\`
-BEFORE:  x = 5 (0x1000)    y = 10 (0x1004)
-         a = 0x1000         b = 0x1004
-
-Step 1:  temp = *a          → temp = 5
-Step 2:  *a = *b            → x = 10
-Step 3:  *b = temp          → y = 5
-
-AFTER:   x = 10 ✅           y = 5 ✅
-\`\`\`
 
 ---
 
-## 5. Arrays and Call by Reference
+## 4. Arrays and Call by Reference
 
 ### The Truth: Arrays Are ALWAYS Passed by Reference
 
@@ -605,29 +555,9 @@ int main() {
 }
 \`\`\`
 
-#### Example: Remove negative values (set to 0)
-
-\`\`\`c
-void removeNegatives(int arr[], int size) {
-    for (int i = 0; i < size; i++) {
-        if (arr[i] < 0) {
-            arr[i] = 0;
-        }
-    }
-}
-
-int main() {
-    int data[] = {5, -3, 8, -1, 4, -7};
-    removeNegatives(data, 6);
-    // data is now {5, 0, 8, 0, 4, 0}
-    for (int i = 0; i < 6; i++) printf("%d ", data[i]);
-    return 0;
-}
-\`\`\`
-
 ---
 
-## 6. Combining Pointers + Arrays — Powerful Patterns
+## 5. Combining Pointers + Arrays
 
 ### Pattern 1: Return multiple results from array processing
 
@@ -697,158 +627,7 @@ int main() {
 
 ---
 
-### Pattern 3: Building output arrays
-
-\`\`\`c
-void getPassingStudents(int grades[], int size, int passing[], int *passCount) {
-    *passCount = 0;
-    for (int i = 0; i < size; i++) {
-        if (grades[i] >= 50) {
-            passing[*passCount] = grades[i];
-            (*passCount)++;    // parentheses matter!
-        }
-    }
-}
-
-int main() {
-    int grades[] = {85, 30, 72, 45, 91, 60, 38};
-    int passing[7];
-    int count;
-
-    getPassingStudents(grades, 7, passing, &count);
-
-    printf("Passing students: %d\\n", count);   // 4
-    for (int i = 0; i < count; i++) {
-        printf("%d ", passing[i]);              // 85 72 91 60
-    }
-    return 0;
-}
-\`\`\`
-
-> **Watch out:** \`(*passCount)++\` is NOT the same as \`*passCount++\`
-> - \`(*passCount)++\` → increment the VALUE at the address ✅
-> - \`*passCount++\` → increment the POINTER, then dereference ❌
-
----
-
-## 7. 2D Arrays and Call by Reference
-
-### Passing 2D Arrays to Functions
-
-\`\`\`c
-void printMatrix(int rows, int cols, int matrix[rows][cols]) {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            printf("%3d ", matrix[i][j]);
-        }
-        printf("\\n");
-    }
-}
-
-int main() {
-    int mat[3][3] = {
-        {1, 2, 3},
-        {4, 5, 6},
-        {7, 8, 9}
-    };
-    printMatrix(3, 3, mat);
-    return 0;
-}
-\`\`\`
-
-> **2D arrays are also passed by reference!** The function can modify the original matrix.
-
-### Modifying a 2D Array
-
-\`\`\`c
-void doubleMatrix(int rows, int cols, int matrix[rows][cols]) {
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            matrix[i][j] *= 2;
-        }
-    }
-}
-
-int main() {
-    int mat[2][3] = {
-        {1, 2, 3},
-        {4, 5, 6}
-    };
-    doubleMatrix(2, 3, mat);
-    // mat is now {{2,4,6}, {8,10,12}} — ORIGINAL changed!
-
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 3; j++) printf("%d ", mat[i][j]);
-        printf("\\n");
-    }
-    return 0;
-}
-\`\`\`
-
-### Getting Row Sums with Pointers
-
-\`\`\`c
-void rowSums(int rows, int cols, int matrix[rows][cols], int sums[]) {
-    for (int i = 0; i < rows; i++) {
-        sums[i] = 0;
-        for (int j = 0; j < cols; j++) {
-            sums[i] += matrix[i][j];
-        }
-    }
-}
-
-int main() {
-    int mat[3][3] = {
-        {1, 2, 3},
-        {4, 5, 6},
-        {7, 8, 9}
-    };
-    int sums[3];
-    rowSums(3, 3, mat, sums);
-    for (int i = 0; i < 3; i++) {
-        printf("Row %d sum = %d\\n", i, sums[i]);
-    }
-    // Row 0 sum = 6
-    // Row 1 sum = 15
-    // Row 2 sum = 24
-    return 0;
-}
-\`\`\`
-
----
-
-## 8. scanf — You've Been Doing This All Along
-
-\`\`\`c
-int age;
-scanf("%d", &age);     // & sends the ADDRESS so scanf can WRITE into age
-\`\`\`
-
-> **\`scanf\` is a function that uses call by reference.**
-
-**But wait — why no \`&\` for strings?**
-
-\`\`\`c
-char name[50];
-scanf("%s", name);     // no & needed!
-\`\`\`
-
-> Because \`name\` is an array, and arrays **already ARE addresses**.
-
-**Everything connects:**
-
-\`\`\`
-scanf("%d", &age)     →  &age is an address    → call by reference
-scanf("%s", name)     →  name IS an address     → call by reference
-func(arr, size)       →  arr IS an address      → call by reference
-func(&x)              →  &x is an address       → call by reference
-\`\`\`
-
-> **It's ALL the same concept. Every time you see \`&\` or an array name in a function call, you're looking at call by reference.**
-
----
-
-## 9. Decision Guide — When to Use Which
+## 6. Decision Guide — When to Use Which
 
 \`\`\`
 ┌─────────────────────────────────────────────────────────────┐
@@ -876,7 +655,7 @@ func(&x)              →  &x is an address       → call by reference
 
 ---
 
-## 10. Common Mistakes
+## 7. Common Mistakes
 
 \`\`\`c
 // ❌ MISTAKE 1: Forgetting & when calling
@@ -910,7 +689,7 @@ func(arr, 3);      // ✅ CORRECT
 
 ---
 
-## 11. Practice Problems
+## 8. Practice Problems
 
 ### Warm-Up: Predict the Output
 
@@ -995,7 +774,7 @@ int main() {
 
 ### Core Practice: Fix the Bugs
 
-**5.** Fix ALL the bugs (there are 3):
+**5.** Fix ALL the bugs:
 
 \`\`\`c
 void triple(int n) {
@@ -1122,28 +901,14 @@ int main() {
 
 <!--ANSWER_11-->
 
-**12.** Write \`int safeDivide(int a, int b, float *result)\` that returns 1 on success, 0 if division by zero:
 
-\`\`\`c
-int main() {
-    float answer;
-    if (safeDivide(17, 5, &answer)) {
-        printf("17 / 5 = %.2f\\n", answer);   // 3.40
-    }
-    if (!safeDivide(10, 0, &answer)) {
-        printf("Cannot divide by zero!\\n");
-    }
-    return 0;
-}
-\`\`\`
 
-<!--ANSWER_12-->
 
 ---
 
 ### Challenge Problems
 
-**13.** Write \`void reverseArray(int arr[], int size)\` using swap with pointers:
+**12.** Write \`void reverseArray(int arr[], int size)\` using swap with pointers:
 
 \`\`\`c
 int main() {
@@ -1155,9 +920,9 @@ int main() {
 }
 \`\`\`
 
-<!--ANSWER_13-->
+<!--ANSWER_12-->
 
-**14.** Write \`void matrixRowSums(int rows, int cols, int mat[rows][cols], int sums[], int *maxRowIndex)\` that computes every row sum AND finds which row has the largest sum:
+**13.** Write \`void matrixRowSums(int rows, int cols, int mat[rows][cols], int sums[], int *maxRowIndex)\` that computes every row sum AND finds which row has the largest sum:
 
 \`\`\`c
 int main() {
@@ -1181,9 +946,9 @@ int main() {
 }
 \`\`\`
 
-<!--ANSWER_14-->
+<!--ANSWER_13-->
 
-**15.** Write \`void gradeReport(int grades[], int size, int *countA, int *countB, int *countC, int *countF)\` where A ≥ 90, B ≥ 80, C ≥ 70, F < 70:
+**14.** Write \`void gradeReport(int grades[], int size, int *countA, int *countB, int *countC, int *countF)\` where A ≥ 90, B ≥ 80, C ≥ 70, F < 70:
 
 \`\`\`c
 int main() {
@@ -1196,11 +961,11 @@ int main() {
 }
 \`\`\`
 
-<!--ANSWER_15-->
+<!--ANSWER_14-->
 
 ---
 
-## 12. Visual Summary
+## 9. Visual Summary
 
 \`\`\`
 ╔═══════════════════════════════════════════════════════════════╗
@@ -1520,30 +1285,6 @@ int main() {
         ANSWER_12: {
           title: "Answer — Problem 12",
           content: `
-<pre><code class="language-c">int safeDivide(int a, int b, float *result) {
-    if (b == 0) {
-        return 0;    // failure
-    }
-    *result = (float)a / b;
-    return 1;        // success
-}
-
-int main() {
-    float answer;
-    if (safeDivide(17, 5, &answer)) {
-        printf("17 / 5 = %.2f\\n", answer);   // 3.40
-    }
-    if (!safeDivide(10, 0, &answer)) {
-        printf("Cannot divide by zero!\\n");
-    }
-    return 0;
-}</code></pre>
-<p><strong>Professional pattern:</strong> Return value = success/failure. Pointer parameter = actual result. You'll see this in file I/O, networking, and system programming.</p>
-`,
-        },
-        ANSWER_13: {
-          title: "Answer — Problem 13",
-          content: `
 <pre><code class="language-c">void swap(int *a, int *b) {
     int temp = *a;
     *a = *b;
@@ -1570,8 +1311,8 @@ int main() {
 <p><strong>Notice:</strong> We reused our <code>swap</code> function! We pass <code>&arr[left]</code> and <code>&arr[right]</code> — the addresses of specific array elements. Functions calling functions with pointers — that's real programming.</p>
 `,
         },
-        ANSWER_14: {
-          title: "Answer — Problem 14",
+        ANSWER_13: {
+          title: "Answer — Problem 13",
           content: `
 <pre><code class="language-c">void matrixRowSums(int rows, int cols, int mat[rows][cols], int sums[], int *maxRowIndex) {
     *maxRowIndex = 0;
@@ -1609,8 +1350,8 @@ int main() {
 <p><strong>This combines everything:</strong> 2D array (by reference), 1D output array (by reference), and a single int result (pointer). All in one function.</p>
 `,
         },
-        ANSWER_15: {
-          title: "Answer — Problem 15",
+        ANSWER_14: {
+          title: "Answer — Problem 14",
           content: `
 <pre><code class="language-c">void gradeReport(int grades[], int size, int *countA, int *countB, int *countC, int *countF) {
     *countA = 0;
