@@ -1,0 +1,31 @@
+/* Page shells & rhythm */
+.page {
+  min-height: 100vh;
+}
+
+.page--lab {
+  padding: calc(var(--nav-height) + var(--space-6)) var(--space-5) var(--space-10);
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.page--home {
+  padding: calc(var(--nav-height) + var(--space-6)) var(--space-5) var(--space-10);
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.page__main {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6) var(--space-6) var(--space-8);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (min-width: 768px) {
+  .page--lab .page__main,
+  .page--home .page__main {
+    padding: var(--space-8);
+  }
+}
