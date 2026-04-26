@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Call by Reference — Lab Guide</title>
+
+    <!-- Prism.js Theme -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="../assets/css/base.css" />
+    <link rel="stylesheet" href="../assets/css/layout.css" />
+    <link rel="stylesheet" href="../assets/css/components.css" />
+  </head>
+  <body class="page page--lab" data-nav-active="lab8">
+    <div id="site-nav" data-site-nav aria-label="Site navigation"></div>
+
+    <header class="lab-header">
+      <div class="lab-header__info">
+        <h1>Salah Wahsh</h1>
+        <p>Teaching Assistant</p>
+        <p>Arab Academy for Science, Technology & Maritime Transport</p>
+      </div>
+      <img
+        src="https://aast.edu/template/en/colleges-all/img/logo-blue03.webp"
+        alt="AAST Logo"
+        class="lab-header__logo"
+      />
+    </header>
+
+    <button
+      type="button"
+      class="toc-toggle"
+      id="toggle-btn"
+      onclick="SiteLabs.toggleNav()"
+    >
+      ☰ On this page
+    </button>
+    <div id="sidebar" aria-label="Table of contents"></div>
+
+    <main class="page__main">
+      <div id="content"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+
+    <script data-site-root=".." src="../assets/js/site.js" defer></script>
+    <script src="../assets/js/lab-common.js"></script>
+
+    <script>
+      const md = `
+  # 🔄 Recursion in C — Lab Session
+  
+  > **Welcome back!** 👋 Last week you learned how to pass variables by reference. This week, we're learning something that might sound scary at first — **recursion**. But here's a secret: if you can write a function and you understand \`if/else\`, you already have everything you need. Let's discover it together, one small step at a time.
+  
+  ---
+  
+  ## 🧠 Before We Start: A Mindset Shift
+  
+  You already know how to solve problems with **loops**. Recursion is just a **different way** to repeat things.
+  
+  > **Loop thinking:** "I'll keep going step by step until I'm done."
+  >
+  > **Recursive thinking:** "I'll do a tiny bit of work, then ask someone else to handle the rest."
+  
+  That "someone else"? It's **the same function** — calling itself with a **smaller problem**.
+  
+  That's it. That's recursion. Let's see it in action.
+  
+  
+  ## Problem 1: Countdown 🚀
+  
+  ### The Problem
+  
+  Write a function that counts down from \`n\` to 1, then prints "Go!"
+  
+  \`\`\`
+  countDown(5) should print:
+  5
+  4
+  3
+  2
+  1
+  Go!
+  \`\`\`
+  
+  ### Let's Think Together 🤔
+  
+  Before writing ANY code, let's answer three questions:
+  
+  **Question 1:** What's the **simplest version** of this problem? What if \`n\` is 0?
+  
+  > If \`n\` is 0, we're done — just print "Go!" This is our **base case** (the stopping point).
+  
+  **Question 2:** If \`n\` is NOT 0, what's the **tiny bit of work** we can do?
+  
+  > Print the current number \`n\`.
+  
+  **Question 3:** After doing that tiny bit of work, what's the **remaining problem**?
+  
+  > Count down from \`n - 1\`. That's a **smaller version** of the same problem!
+  
+  ### The Pattern
+  
+  \`\`\`
+  countDown(5):
+    print 5, then countDown(4)
+      print 4, then countDown(3)
+        print 3, then countDown(2)
+          print 2, then countDown(1)
+            print 1, then countDown(0)
+              print "Go!" and STOP ← base case!
+  \`\`\`
+  
+  ### The Code
+  
+  \`\`\`c
+  #include <stdio.h>
+  
+  void countDown(int n) {
+      // Base case: when do we stop?
+      if (n == 0) {
+          printf("Go!\\n");
+          return;              // STOP — don't call yourself again
+      }
+  
+      // Recursive case: do a little work, then recurse
+      printf("%d\\n", n);       // print current number
+      countDown(n - 1);        // handle the rest (smaller problem)
+  }
+  
+  int main() {
+      countDown(5);
+      return 0;
+  }
+  \`\`\`
+  
+  \`\`\`
+  Output:
+  5
+  4
+  3
+  2
+  1
+  Go!
+  \`\`\`
+  
+  ### 🔑 Key Takeaway
+  
+  Every recursive function needs exactly **two things**:
+  1. **Base case** — when to STOP (without this → infinite calls → crash 💥)
+  2. **Recursive case** — do a little work, then call yourself with a **smaller** problem
+  
+  > 💡 Think of it like Russian nesting dolls 🪆 — each doll opens to reveal a smaller doll inside, until you reach the tiniest one (the base case).
+  
+  ---
+  
+  ### 🧪 Quick Practice 1
+  
+  **Modify the countdown to count UP instead:**
+  
+  \`\`\`
+  countUp(5) should print:
+  1
+  2
+  3
+  4
+  5
+  \`\`\`
+  
+  **💡 Hints:**
+  - The base case is the same (stop when \`n == 0\`).
+  - The trick: should you print **before** or **after** the recursive call?
+  - With countdown, we printed first, then recursed. What if you **recurse first**, then print?
+  
+  <!--ANSWER_V1-->
+  
+  ---
+  
+  ## Problem 2: Factorial ✖️
+  
+  ### The Problem
+  
+  Calculate \`n!\` (n factorial).
+  
+  \`\`\`
+  5! = 5 × 4 × 3 × 2 × 1 = 120
+  3! = 3 × 2 × 1 = 6
+  1! = 1
+  0! = 1  (by definition)
+  \`\`\`
+  
+  ### Let's Think Together 🤔
+  
+  You already know how to do this with a loop:
+  
+  \`\`\`c
+  // The loop version you already know
+  int factorial_loop(int n) {
+      int result = 1;
+      for (int i = 1; i <= n; i++) {
+          result *= i;
+      }
+      return result;
+  }
+  \`\`\`
+  
+  Now let's think about it **recursively**. Ask yourself:
+  
+  **Question 1:** What's the simplest case where you know the answer immediately?
+  
+  > \`0! = 1\` and \`1! = 1\`. No calculation needed. That's our **base case**.
+  
+  **Question 2:** Can you express \`5!\` in terms of a **smaller** factorial?
+  
+  > \`5! = 5 × 4!\` — Yes! We do ONE multiplication, then ask "what's 4!?"
+  
+  **Question 3:** Does this keep getting smaller until it hits the base case?
+  
+  > \`5! = 5 × 4! = 5 × 4 × 3! = 5 × 4 × 3 × 2! = 5 × 4 × 3 × 2 × 1! = 5 × 4 × 3 × 2 × 1\` ✅
+  
+  ### Tracing Through the Execution
+  
+  Let's watch \`factorial(4)\` step by step:
+  
+  \`\`\`
+  factorial(4)
+    → return 4 * factorial(3)
+                  factorial(3)
+                    → return 3 * factorial(2)
+                                  factorial(2)
+                                    → return 2 * factorial(1)
+                                                  factorial(1)
+                                                    → return 1  ← BASE CASE!
+                                    → return 2 * 1 = 2
+                    → return 3 * 2 = 6
+    → return 4 * 6 = 24 ✅
+  \`\`\`
+  
+  > 📝 Notice the pattern: the function calls go **down** (getting smaller), then the results come back **up** (multiplying as they return).
+  
+  ### The Code
+  
+  \`\`\`c
+  #include <stdio.h>
+  
+  int factorial(int n) {
+      // Base case
+      if (n <= 1) {
+          return 1;
+      }
+  
+      // Recursive case: n! = n × (n-1)!
+      return n * factorial(n - 1);
+  }
+  
+  int main() {
+      printf("5! = %d\\n", factorial(5));   // 120
+      printf("3! = %d\\n", factorial(3));   // 6
+      printf("0! = %d\\n", factorial(0));   // 1
+      return 0;
+  }
+  \`\`\`
+  
+  
+  ### 🧪 Quick Practice 2
+  
+  **Write a recursive function \`int sumToN(int n)\` that returns \`1 + 2 + 3 + ... + n\`:**
+  
+  \`\`\`c
+  int main() {
+      printf("%d\\n", sumToN(5));   // 15 (1+2+3+4+5)
+      printf("%d\\n", sumToN(10));  // 55
+      printf("%d\\n", sumToN(1));   // 1
+      return 0;
+  }
+  \`\`\`
+  
+  **💡 Hints:**
+  - Base case: What is \`sumToN(1)\`? Just 1.
+  - Recursive case: \`sumToN(5) = 5 + sumToN(4)\`. See the pattern?
+  - It's almost identical to factorial — just change \`*\` to \`+\`.
+  
+  <!--ANSWER_V2-->
+  
+  ---
+  
+
+  ## Solve those problems on your own
+  
+  ### Problem 1: Product from 1 to n (Loop + Recursion) 🔄
+  
+  Write BOTH:
+  - \`productLoop(int n)\`
+  - \`productRec(int n)\`
+  
+  They should return:
+  
+  \`\`\`
+  product(5) = 120
+  product(1) = 1
+  \`\`\`
+  
+  \`\`\`c
+  int main() {
+      printf("Loop: %d\\n", productLoop(5));      // 120
+      printf("Recursive: %d\\n", productRec(5));  // 120
+      return 0;
+  }
+  \`\`\`
+  
+  **💡 Hints:**
+  - Base case for recursion: \`n <= 1\` returns 1.
+  - Recursive idea: \`n * productRec(n - 1)\`.
+  
+  <!--ANSWER_V3-->
+  
+  ---
+  
+  ### Problem 2: Multiply Using Addition 💪
+
+  
+  Write \`int multiply(int a, int b)\` recursively using only addition (no \`*\` for the multiplication part—using \`+\` and recursion is the point).
+  
+  \`\`\`
+  multiply(3, 4) = 12
+  multiply(7, 0) = 0
+  \`\`\`
+  
+  \`\`\`c
+  int main() {
+      printf("%d\\n", multiply(3, 4));   // 12
+      printf("%d\\n", multiply(5, 3));   // 15
+      printf("%d\\n", multiply(7, 0));   // 0
+      return 0;
+  }
+  \`\`\`
+  
+  **💡 Hints:**
+  - Base case: \`b == 0\`
+  - Recursive idea: \`a + multiply(a, b - 1)\`
+  
+  <!--ANSWER_V4-->
+  
+  ---
+  
+  ### Problem 3: Find Max in Array 📊
+  
+  
+  Write \`int findMax(int arr[], int size)\`.
+  
+  \`\`\`c
+  int main() {
+      int arr[] = {3, 7, 2, 8, 1};
+      printf("Max = %d\\n", findMax(arr, 5));  // 8
+      return 0;
+  }
+  \`\`\`
+  
+  **💡 Hints:**
+  - Base case: \`size == 1\` return \`arr[0]\`
+  - Recursive idea: compare \`arr[size-1]\` with max of first \`size-1\` elements.
+  
+  <!--ANSWER_V5-->
+  
+  ---
+  
+  ### Problem 4: All Positive Check 🔢
+  
+
+  Write \`int allPositive(int arr[], int size)\`:
+  - return 1 if all elements are positive
+  - return 0 otherwise
+  
+  \`\`\`c
+  int main() {
+      int a[] = {3, 7, 2, 8, 1};
+      int b[] = {3, -7, 2, 8, 1};
+  
+      printf("%d\\n", allPositive(a, 5));  // 1
+      printf("%d\\n", allPositive(b, 5));  // 0
+      return 0;
+  }
+  \`\`\`
+  
+  **💡 Hints:**
+  - Base case: \`size == 0\` returns 1
+  - If last element is <= 0, return 0 immediately
+  - Else recurse on \`size - 1\`
+  
+  <!--ANSWER_V6-->
+  
+  ---
+  
+  ## Additional Problems
+  
+  If you want extra challenge after class, try these on your own:
+  
+  - Fibonacci
+  - Palindrome
+  - Print digits
+  - Binary search
+  - Tower of Hanoi
+  - Merge sort
+  
+  We removed them from the required part to keep the lab lighter and easier to finish in one session.
+  
+  ---
+  
+  ## 🧩 Summary: The Recursion Recipe
+  
+  Every time you face a recursive problem, ask these **three questions**:
+  
+  \`\`\`
+  ╔═══════════════════════════════════════════════════════════════╗
+  ║                  THE RECURSION RECIPE 🍳                     ║
+  ╠═══════════════════════════════════════════════════════════════╣
+  ║                                                               ║
+  ║  1. What is the SIMPLEST case? (Base case)                    ║
+  ║     → When can I answer IMMEDIATELY without recursion?        ║
+  ║     → Examples: n == 0, n == 1, empty array, single element   ║
+  ║                                                               ║
+  ║  2. How do I make the problem SMALLER? (Recursive case)       ║
+  ║     → n - 1, size - 1, left + 1, right - 1, n / 10           ║
+  ║     → The problem MUST get closer to the base case!           ║
+  ║                                                               ║
+  ║  3. How do I COMBINE my tiny work with the recursive result?  ║
+  ║     → Add, multiply, compare, append, print...                ║
+  ║     → "My work" + "result from the smaller problem"           ║
+  ║                                                               ║
+  ╠═══════════════════════════════════════════════════════════════╣
+  ║                                                               ║
+  ║  TRUST THE FUNCTION!                                          ║
+  ║  Don't trace every level in your head.                        ║
+  ║  Assume the recursive call works correctly.                   ║
+  ║  Just handle YOUR level.                                      ║
+  ║                                                               ║
+  ╚═══════════════════════════════════════════════════════════════╝
+  \`\`\`
+  
+  ---
+  
+  ## ⚠️ Common Recursion Mistakes
+  
+  ### Mistake 1: Forgetting the base case
+  \`\`\`c
+  int factorial(int n) {
+      return n * factorial(n - 1);  // ❌ Never stops! Stack overflow!
+  }
+  \`\`\`
+  ✅ **Always have a base case that returns WITHOUT calling itself.**
+  
+  ### Mistake 2: Base case doesn't match the shrinking
+  \`\`\`c
+  int factorial(int n) {
+      if (n == 0) return 1;         // base case checks n == 0
+      return n * factorial(n - 2);  // ❌ but we subtract 2! Skips 0 for odd n!
+  }
+  \`\`\`
+  ✅ **Make sure the recursive step actually reaches the base case.**
+  
+  ### Mistake 3: Not returning the recursive result
+  \`\`\`c
+  int factorial(int n) {
+      if (n <= 1) return 1;
+      factorial(n - 1);             // ❌ Forgot 'return'! Result is lost!
+  }
+  \`\`\`
+  ✅ **If the function returns a value, \`return\` the recursive call.**
+  
+  ### Mistake 4: Modifying and recursing on the same variable
+  \`\`\`c
+  void printDigits(int n) {
+      n = n / 10;                   // ❌ Modified n before using n % 10
+      printf("%d\\n", n % 10);
+      printDigits(n);
+  }
+  \`\`\`
+  ✅ **Be careful about the order of operations.**
+  
+
+  
+  `;
+
+      const answers = {
+        ANSWER_V1: {
+          title: "Answer — Variation 1 (Count Up)",
+          content: `
+  <pre><code class="language-c">void countUp(int n) {
+      // Base case: same as before
+      if (n == 0) {
+          return;
+      }
+  
+      // Recurse FIRST (go all the way down)...
+      countUp(n - 1);
+  
+      // ...THEN print (on the way back up)
+      printf("%d\\n", n);
+  }
+  
+  int main() {
+      countUp(5);
+      return 0;
+  }</code></pre>
+  <p><strong>Why does this work?</strong></p>
+  <pre><code>countUp(5)
+    countUp(4)
+      countUp(3)
+        countUp(2)
+          countUp(1)
+            countUp(0) → returns (base case)
+          prints 1
+        prints 2
+      prints 3
+    prints 4
+  prints 5</code></pre>
+  <p>By recursing <strong>before</strong> printing, we go all the way down to 1 first, then print on the way <strong>back up</strong>. Same function structure, opposite order!</p>
+  `,
+        },
+        ANSWER_V2: {
+          title: "Answer — Variation 2 (Sum to N)",
+          content: `
+  <pre><code class="language-c">int sumToN(int n) {
+      // Base case
+      if (n == 1) {
+          return 1;
+      }
+  
+      // Recursive case: n + sum of everything before n
+      return n + sumToN(n - 1);
+  }
+  
+  int main() {
+      printf("%d\\n", sumToN(5));   // 15 (1+2+3+4+5)
+      printf("%d\\n", sumToN(10));  // 55
+      printf("%d\\n", sumToN(1));   // 1
+      return 0;
+  }</code></pre>
+  <p><strong>Trace for sumToN(5):</strong></p>
+  <pre><code>sumToN(5) = 5 + sumToN(4)
+                  sumToN(4) = 4 + sumToN(3)
+                                  sumToN(3) = 3 + sumToN(2)
+                                                  sumToN(2) = 2 + sumToN(1)
+                                                                  sumToN(1) = 1 ← base case
+                                                  = 2 + 1 = 3
+                                  = 3 + 3 = 6
+                  = 4 + 6 = 10
+  = 5 + 10 = 15 ✅</code></pre>
+  `,
+        },
+        ANSWER_V3: {
+          title: "Answer — Product (loop + recursive)",
+          content: `
+  <pre><code class="language-c">// Loop version
+  int productLoop(int n) {
+      int result = 1;
+      for (int i = 1; i <= n; i++) {
+          result *= i;
+      }
+      return result;
+  }
+  
+  // Recursive version
+  int productRec(int n) {
+      if (n <= 1) return 1;       // base case
+      return n * productRec(n - 1); // recursive case
+  }
+  
+  int main() {
+      printf("Loop: %d\\n", productLoop(5));    // 120
+      printf("Recursive: %d\\n", productRec(5)); // 120
+      return 0;
+  }</code></pre>
+  <p><strong>Key insight:</strong> Both versions produce the exact same result. The loop accumulates step by step; the recursion breaks it down and multiplies on the way back up. Two different roads to the same destination!</p>
+  `,
+        },
+        ANSWER_V4: {
+          title: "Answer — Multiply using addition",
+          content: `
+  <pre><code class="language-c">int multiply(int a, int b) {
+      // Base case: anything × 0 = 0
+      if (b == 0) {
+          return 0;
+      }
+  
+      // Recursive case: a × b = a + a × (b-1)
+      return a + multiply(a, b - 1);
+  }
+  
+  int main() {
+      printf("%d\\n", multiply(3, 4));   // 12
+      printf("%d\\n", multiply(5, 3));   // 15
+      printf("%d\\n", multiply(7, 0));   // 0
+      return 0;
+  }</code></pre>
+  <p><strong>Trace for multiply(3, 4):</strong></p>
+  <pre><code>multiply(3, 4) = 3 + multiply(3, 3)
+                         = 3 + multiply(3, 2)
+                                 = 3 + multiply(3, 1)
+                                         = 3 + multiply(3, 0)
+                                                 = 0  ← base case
+                                         = 3 + 0 = 3
+                                 = 3 + 3 = 6
+                         = 3 + 6 = 9
+                 = 3 + 9 = 12 ✅</code></pre>
+  <p>We added 3 exactly 4 times: 3 + 3 + 3 + 3 = 12.</p>
+  `,
+        },
+        ANSWER_V5: {
+          title: "Answer — Find max in array",
+          content: `
+  <pre><code class="language-c">int findMax(int arr[], int size) {
+      // Base case: only one element — it's the max
+      if (size == 1) {
+          return arr[0];
+      }
+  
+      // Recursive case: get the max of the rest
+      int maxOfRest = findMax(arr, size - 1);
+  
+      // Compare last element with the max of the rest
+      if (arr[size - 1] > maxOfRest) {
+          return arr[size - 1];
+      } else {
+          return maxOfRest;
+      }
+  }
+  
+  int main() {
+      int arr[] = {3, 7, 2, 8, 1};
+      printf("Max = %d\\n", findMax(arr, 5));  // 8
+      return 0;
+  }</code></pre>
+  <p><strong>How it works:</strong> "The max of the whole array is either the last element, or the max of everything else — whichever is bigger." Simple!</p>
+  `,
+        },
+        ANSWER_V6: {
+          title: "Answer — All Positive Check",
+          content: `
+  <pre><code class="language-c">int allPositive(int arr[], int size) {
+      // Base case: empty array — vacuously true
+      if (size == 0) {
+          return 1;
+      }
+  
+      // If the last element is NOT positive, we're done
+      if (arr[size - 1] <= 0) {
+          return 0;
+      }
+  
+      // Last element is positive — check the rest
+      return allPositive(arr, size - 1);
+  }
+  
+  int main() {
+      int a[] = {3, 7, 2, 8, 1};
+      int b[] = {3, -7, 2, 8, 1};
+      int c[] = {5};
+  
+      printf("%d\\n", allPositive(a, 5));  // 1
+      printf("%d\\n", allPositive(b, 5));  // 0
+      printf("%d\\n", allPositive(c, 1));  // 1
+      return 0;
+  }</code></pre>
+  <p><strong>Pattern:</strong> This is an "all" check — if we find ONE bad element, immediately return 0. Otherwise, keep checking. If we reach the end without finding a bad one, return 1.</p>
+  `,
+        },
+      };
+
+      const contentEl = document.getElementById("content");
+      let html = marked.parse(md);
+      for (const key in answers) {
+        const ans = answers[key];
+        const placeholder = "<!--" + key + "-->";
+        const replacement =
+          '<button class="answer-toggle" onclick="toggleAnswer(\'' +
+          key +
+          "', this)\">" +
+          "▶ Show Answer ✅</button>" +
+          '<div class="answer-block" id="' +
+          key +
+          '">' +
+          "<h4>✅ " +
+          ans.title +
+          "</h4>" +
+          ans.content +
+          "</div>";
+        html = html.replace(placeholder, replacement);
+      }
+
+      contentEl.innerHTML = html;
+      wrapHintsInContent(contentEl);
+
+      if (window.Prism && typeof Prism.highlightAll === "function") {
+        Prism.highlightAll();
+      }
+
+      SiteLabs.buildTocFromContent("#content", "#sidebar");
+
+      function toggleAnswer(id, btn) {
+        const block = document.getElementById(id);
+        if (!block || !btn) return;
+        const isVisible = block.classList.contains("visible");
+        if (isVisible) {
+          block.classList.remove("visible");
+          btn.textContent = "▶ Show Answer ✅";
+          btn.classList.remove("revealed");
+        } else {
+          block.classList.add("visible");
+          btn.textContent = "▼ Hide Answer ✅";
+          btn.classList.add("revealed");
+          if (window.Prism && typeof Prism.highlightAllUnder === "function") {
+            Prism.highlightAllUnder(block);
+          }
+        }
+      }
+
+      function wrapHintsInContent(root) {
+        let hintIndex = 0;
+        const paragraphs = Array.from(root.querySelectorAll("p"));
+        for (const p of paragraphs) {
+          if (!p.isConnected || p.closest(".answer-block")) continue;
+          const strong = p.querySelector(":scope > strong");
+          if (!strong || strong.textContent.trim() !== "💡 Hints:") continue;
+          const list = p.nextElementSibling;
+          if (!list || (list.tagName !== "UL" && list.tagName !== "OL")) {
+            continue;
+          }
+
+          const parent = p.parentElement;
+          if (!parent) continue;
+
+          const id = "HINT_" + hintIndex++;
+          const wrap = document.createElement("div");
+          wrap.className = "hint-reveal";
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "answer-toggle";
+          btn.textContent = "▶ Show hints 💡";
+          btn.addEventListener("click", function () {
+            toggleHint(id, btn);
+          });
+
+          const block = document.createElement("div");
+          block.className = "answer-block";
+          block.id = id;
+
+          parent.insertBefore(wrap, p);
+          wrap.appendChild(btn);
+          wrap.appendChild(block);
+          block.appendChild(p);
+          block.appendChild(list);
+        }
+      }
+
+      function toggleHint(id, btn) {
+        const block = document.getElementById(id);
+        if (!block || !btn) return;
+        const isVisible = block.classList.contains("visible");
+        if (isVisible) {
+          block.classList.remove("visible");
+          btn.textContent = "▶ Show hints 💡";
+          btn.classList.remove("revealed");
+        } else {
+          block.classList.add("visible");
+          btn.textContent = "▼ Hide hints 💡";
+          btn.classList.add("revealed");
+          if (window.Prism && typeof Prism.highlightAllUnder === "function") {
+            Prism.highlightAllUnder(block);
+          }
+        }
+      }
+
+      window.toggleAnswer = toggleAnswer;
+    </script>
+  </body>
+</html>
