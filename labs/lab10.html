@@ -381,7 +381,7 @@ char str[] = "A";        // string with one character — uses double quotes
 > **Single quotes = one character. Double quotes = string (auto adds \\0).**
 
 
-## 3. String Input/Output
+## 2. String Input/Output
 
 ### Output with \`printf\`
 
@@ -463,7 +463,7 @@ Result: name = "Ahmed Ali\\n"   ← includes the newline!
 
 ---
 
-## 4. String Functions — \`#include <string.h>\`
+## 3. String Functions — \`#include <string.h>\`
 
 | Function | Signature | What it does |
 |---|---|---|
@@ -603,7 +603,7 @@ strcmp("Apple", "apple")    // returns < 0  ('A' = 65, 'a' = 97)
 ---
 
 
-### 2D Arrays of Strings
+## 4. 2D Arrays of Strings
 
 Each row is a separate string:
 
@@ -642,7 +642,7 @@ for (int i = 0; i < 4; i++) {
 
 ---
 
-## 6. Character Functions — \`#include <ctype.h>\`
+## 5. Character Functions — \`#include <ctype.h>\`
 
 These work on **single characters**, not strings.
 
@@ -679,7 +679,7 @@ printf("%s\\n", msg);    // HELLO WORLD
 \`\`\`
 
 
-## 7. Character I/O: \`getchar\`, \`putchar\`
+## 6. Character I/O: \`getchar\`, \`putchar\`
 
 ### \`getchar()\` — Read ONE character from keyboard
 
@@ -714,7 +714,7 @@ Output: HELLO WORLD
 
 ---
 
-## 8. Common Mistakes Summary
+## 7. Common Mistakes Summary
 
 \`\`\`c
 // ❌ MISTAKE 1: Comparing strings with ==
@@ -750,7 +750,7 @@ scanf("%s", name);                 // ✅
 
 ---
 
-## 9. Practice Problems
+## 8. Practice Problems
 
 ### Warm-Up: Predict the Output
 
@@ -805,7 +805,7 @@ printf("sizeof: %lu\\n", sizeof(str));
 
 ### Core Practice: Fix the Bugs
 
-**6.** Fix ALL the bugs:
+**5.** Fix ALL the bugs:
 
 \`\`\`c
 char name[5] = "Hello";
@@ -816,12 +816,12 @@ if (copy == "Hello") {
 }
 \`\`\`
 
-<!--ANSWER_6-->
+<!--ANSWER_5-->
 
 
 ### Write Functions
 
-**8.** Write a function \`int countVowels(char str[])\` that counts the number of vowels (a, e, i, o, u — both cases):
+**6.** Write a function \`int countVowels(char str[])\` that counts the number of vowels (a, e, i, o, u — both cases):
 
 \`\`\`c
 int main() {
@@ -832,9 +832,9 @@ int main() {
 }
 \`\`\`
 
-<!--ANSWER_8-->
+<!--ANSWER_6-->
 
-**9.** Write a function \`void toUpperStr(char str[])\` that converts an entire string to uppercase **in place**:
+**7.** Write a function \`void toUpperStr(char str[])\` that converts an entire string to uppercase **in place**:
 
 \`\`\`c
 int main() {
@@ -845,9 +845,9 @@ int main() {
 }
 \`\`\`
 
-<!--ANSWER_9-->
+<!--ANSWER_7-->
 
-**10.** Write a function \`int countWords(char str[])\` that counts the number of words in a string (words are separated by spaces):
+**8.** Write a function \`int countWords(char str[])\` that counts the number of words in a string (words are separated by spaces):
 
 \`\`\`c
 int main() {
@@ -859,9 +859,9 @@ int main() {
 }
 \`\`\`
 
-<!--ANSWER_10-->
+<!--ANSWER_8-->
 
-**11.** Write a function \`void reverseString(char str[])\` that reverses a string **in place**:
+**9.** Write a function \`void reverseString(char str[])\` that reverses a string **in place**:
 
 \`\`\`c
 int main() {
@@ -872,11 +872,11 @@ int main() {
 }
 \`\`\`
 
-<!--ANSWER_11-->
+<!--ANSWER_9-->
 
 ### Challenge Problems
 
-**14.** Write a function \`int isPalindrome(char str[])\` that checks if a string is a palindrome (ignoring case):
+**10.** Write a function \`int isPalindrome(char str[])\` that checks if a string is a palindrome (ignoring case):
 
 \`\`\`c
 int main() {
@@ -887,7 +887,7 @@ int main() {
 }
 \`\`\`
 
-<!--ANSWER_14-->
+<!--ANSWER_10-->
 
 `;
 
@@ -956,20 +956,6 @@ After str[2]='\\0':
         ANSWER_5: {
           title: "Answer — Problem 5",
           content: `
-<pre><code>World</code></pre>
-<p><strong>Trace:</strong></p>
-<pre><code>word:         H e l l o   W o r l d \\0
-index:        0 1 2 3 4 5 6 7 8 9 10
-
-word + 6 →              ^ start here
-copy 5 chars:           W o r l d
-sub:                    "World\\0"</code></pre>
-<p><strong>Key:</strong> <code>word + 6</code> is pointer arithmetic — it gives the address of index 6. <code>strncpy</code> copies 5 characters starting from there. We manually add <code>\\0</code> at the end.</p>
-`,
-        },
-        ANSWER_6: {
-          title: "Answer — Problem 6",
-          content: `
 <p><strong>Three bugs:</strong></p>
 <ol>
   <li><code>char name[5]</code> → <code>char name[6]</code> (need room for <code>\\0</code>)</li>
@@ -984,24 +970,8 @@ if (strcmp(copy, "Hello") == 0) {   // ✅ use strcmp
 }</code></pre>
 `,
         },
-        ANSWER_7: {
-          title: "Answer — Problem 7",
-          content: `
-<p><strong>One critical bug:</strong> <code>result</code> is uninitialized! <code>strcat</code> looks for <code>\\0</code> to know where to start appending — but <code>result</code> contains garbage, so <code>\\0</code> could be anywhere (or nowhere).</p>
-<p><strong>Fix:</strong> Initialize <code>result</code> first:</p>
-<pre><code class="language-c">char result[50] = "";              // ✅ initialize as empty string
-strcat(result, "Hello");
-strcat(result, " World");
-printf("%s\\n", result);            // Hello World</code></pre>
-<p>Or use <code>strcpy</code> for the first one:</p>
-<pre><code class="language-c">char result[50];
-strcpy(result, "Hello");           // ✅ first string: use strcpy
-strcat(result, " World");          // then concat
-printf("%s\\n", result);            // Hello World</code></pre>
-`,
-        },
-        ANSWER_8: {
-          title: "Answer — Problem 8",
+        ANSWER_6: {
+          title: "Answer — Problem 6",
           content: `
 <pre><code class="language-c">#include &lt;ctype.h&gt;
 
@@ -1018,8 +988,8 @@ int countVowels(char str[]) {
 <p><strong>Key technique:</strong> Convert to lowercase first with <code>tolower</code>, then you only need to check 5 cases instead of 10. Works for both 'A' and 'a'.</p>
 `,
         },
-        ANSWER_9: {
-          title: "Answer — Problem 9",
+        ANSWER_7: {
+          title: "Answer — Problem 7",
           content: `
 <pre><code class="language-c">#include &lt;ctype.h&gt;
 
@@ -1039,8 +1009,8 @@ int main() {
 <p><strong>Why it works in place:</strong> Arrays are passed by reference! The function modifies the original characters directly.</p>
 `,
         },
-        ANSWER_10: {
-          title: "Answer — Problem 10",
+        ANSWER_8: {
+          title: "Answer — Problem 8",
           content: `
 <pre><code class="language-c">int countWords(char str[]) {
     int count = 0;
@@ -1066,8 +1036,8 @@ int main() {
 <p><strong>The trick:</strong> Use a flag <code>inWord</code> to detect <strong>transitions</strong> from space to non-space. Each transition = one new word.</p>
 `,
         },
-        ANSWER_11: {
-          title: "Answer — Problem 11",
+        ANSWER_9: {
+          title: "Answer — Problem 9",
           content: `
 <pre><code class="language-c">#include &lt;string.h&gt;
 
@@ -1097,77 +1067,8 @@ Step 2: [o][l][l][e][H]   left=2, right=2, STOP
 Result: "olleH"</code></pre>
 `,
         },
-        ANSWER_12: {
-          title: "Answer — Problem 12",
-          content: `
-<pre><code class="language-c">int findString(char arr[][30], int n, char target[]) {
-    for (int i = 0; i < n; i++) {
-        if (strcmp(arr[i], target) == 0) {
-            return i;    // found!
-        }
-    }
-    return -1;           // not found
-}
-
-int main() {
-    char names[5][30] = {"Ahmed", "Sara", "Omar", "Lina", "Tarek"};
-    printf("%d\\n", findString(names, 5, "Omar"));    // 2
-    printf("%d\\n", findString(names, 5, "Ali"));     // -1
-    return 0;
-}</code></pre>
-<p><strong>This is just linear search — but with <code>strcmp</code> instead of <code>==</code>!</strong> Every string operation has its parallel from arrays, just using string functions.</p>
-`,
-        },
-        ANSWER_13: {
-          title: "Answer — Problem 13",
-          content: `
-<pre><code class="language-c">#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-
-void sortStrings(char arr[][30], int n) {
-    char temp[30];
-    for (int i = 0; i < n - 1; i++) {
-        int minIdx = i;
-        for (int j = i + 1; j < n; j++) {
-            if (strcmp(arr[j], arr[minIdx]) < 0) {
-                minIdx = j;
-            }
-        }
-        if (minIdx != i) {
-            strcpy(temp, arr[i]);
-            strcpy(arr[i], arr[minIdx]);
-            strcpy(arr[minIdx], temp);
-        }
-    }
-}
-
-int main() {
-    char names[5][30];
-
-    printf("Enter 5 names:\\n");
-    for (int i = 0; i < 5; i++) {
-        printf("Name %d: ", i + 1);
-        scanf("%s", names[i]);
-    }
-
-    sortStrings(names, 5);
-
-    printf("\\nSorted:\\n");
-    for (int i = 0; i < 5; i++) {
-        printf("%s\\n", names[i]);
-    }
-    return 0;
-}</code></pre>
-<p><strong>Key points:</strong></p>
-<ul>
-  <li>Compare with <code>strcmp</code>, not <code>&lt;</code></li>
-  <li>Swap with <code>strcpy</code>, not <code>=</code></li>
-  <li>This is the exact same selection sort from arrays — just using string functions</li>
-</ul>
-`,
-        },
-        ANSWER_14: {
-          title: "Answer — Problem 14",
+        ANSWER_10: {
+          title: "Answer — Problem 10",
           content: `
 <pre><code class="language-c">#include &lt;string.h&gt;
 #include &lt;ctype.h&gt;
@@ -1198,77 +1099,6 @@ left=1, right=5: tolower('a')='a' == tolower('a')='a' ✅
 left=2, right=4: tolower('c')='c' == tolower('c')='c' ✅
 left=3, right=3: left >= right → STOP → palindrome!</code></pre>
 <p><strong>Key:</strong> <code>tolower</code> makes it case-insensitive. Without it, 'R' != 'r' and "Racecar" would fail.</p>
-`,
-        },
-        ANSWER_15: {
-          title: "Answer — Problem 15",
-          content: `
-<pre><code class="language-c">#include &lt;string.h&gt;
-
-void censorWord(char str[], char word[]) {
-    int wordLen = strlen(word);
-    char *pos = strstr(str, word);   // find first occurrence
-
-    while (pos != NULL) {
-        // replace each character of the found word with *
-        for (int i = 0; i < wordLen; i++) {
-            pos[i] = '*';
-        }
-        pos = strstr(pos + wordLen, word);  // find next occurrence
-    }
-}
-
-int main() {
-    char msg[100] = "the cat sat on the mat with the cat";
-    censorWord(msg, "cat");
-    printf("%s\\n", msg);
-    // the *** sat on the mat with the ***
-    return 0;
-}</code></pre>
-<p><strong>New function: <code>strstr(haystack, needle)</code></strong></p>
-<ul>
-  <li>Finds the first occurrence of <code>needle</code> inside <code>haystack</code></li>
-  <li>Returns a <strong>pointer</strong> to where it was found, or <code>NULL</code> if not found</li>
-  <li>We use it in a loop to find and replace ALL occurrences</li>
-</ul>
-<p><strong>Bonus:</strong> This is how content filters work in chat apps and games — find bad words, replace with asterisks!</p>
-`,
-        },
-        ANSWER_16: {
-          title: "Answer — Problem 16",
-          content: `
-<pre><code class="language-c">#include &lt;ctype.h&gt;
-#include &lt;string.h&gt;
-
-void charFrequency(char str[]) {
-    int freq[26] = {0};   // 26 letters, all start at 0
-
-    for (int i = 0; str[i] != '\\0'; i++) {
-        if (isalpha(str[i])) {
-            int index = tolower(str[i]) - 'a';   // 'a'→0, 'b'→1, ..., 'z'→25
-            freq[index]++;
-        }
-    }
-
-    for (int i = 0; i < 26; i++) {
-        if (freq[i] > 0) {
-            printf("%c: %d\\n", 'a' + i, freq[i]);
-        }
-    }
-}
-
-int main() {
-    charFrequency("Hello World");
-    return 0;
-}</code></pre>
-<p><strong>The magic trick: <code>tolower(ch) - 'a'</code></strong></p>
-<pre><code>'a' - 'a' = 0    → freq[0]
-'b' - 'a' = 1    → freq[1]
-'h' - 'a' = 7    → freq[7]
-'z' - 'a' = 25   → freq[25]</code></pre>
-<p>This maps every letter to an array index 0-25. It's the most common technique for counting characters — you'll use it everywhere!</p>
-<p><strong>Trace for "Hello World":</strong></p>
-<pre><code>d:1  e:1  h:1  l:3  o:2  r:1  w:1</code></pre>
 `,
         },
       };
