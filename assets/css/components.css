@@ -284,6 +284,19 @@
   margin: var(--space-2) 0;
 }
 
+.danger-box {
+  background: #fef2f2;
+  border-left: 4px solid #dc2626;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  padding: var(--space-4) var(--space-5);
+  margin: var(--space-5) 0;
+  font-size: 1.02em;
+}
+
+.danger-box p {
+  margin: var(--space-2) 0;
+}
+
 /* Lab 8 callout */
 .sneak-peek {
   background: linear-gradient(135deg, #fff8c5, #ffea7f);
@@ -417,6 +430,22 @@
   text-decoration: none;
   background: #136d2e;
   box-shadow: 0 4px 12px rgba(26, 127, 55, 0.25);
+}
+
+.lab-card--finale {
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--color-accent-soft) 70%, var(--color-surface)),
+    var(--color-surface)
+  );
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+}
+
+.lab-card--finale .lab-card__badge {
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  color: var(--color-accent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 25%, var(--color-border));
 }
 
 .lab-card--secret .lab-card__secret {

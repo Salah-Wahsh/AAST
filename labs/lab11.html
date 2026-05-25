@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Searching &amp; Sorting in C — Lab Guide</title>
+
+    <!-- Prism.js Theme -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="../assets/css/base.css" />
+    <link rel="stylesheet" href="../assets/css/layout.css" />
+    <link rel="stylesheet" href="../assets/css/components.css" />
+  </head>
+  <body class="page page--lab" data-nav-active="lab11">
+    <div id="site-nav" data-site-nav aria-label="Site navigation"></div>
+
+    <header class="lab-header">
+      <div class="lab-header__info">
+        <h1>Salah Wahsh</h1>
+        <p>Teaching Assistant</p>
+        <p>Arab Academy for Science, Technology & Maritime Transport</p>
+      </div>
+      <img
+        src="https://aast.edu/template/en/colleges-all/img/logo-blue03.webp"
+        alt="AAST Logo"
+        class="lab-header__logo"
+      />
+    </header>
+
+    <button
+      type="button"
+      class="toc-toggle"
+      id="toggle-btn"
+      onclick="SiteLabs.toggleNav()"
+    >
+      ☰ On this page
+    </button>
+    <div id="sidebar" aria-label="Table of contents"></div>
+
+    <main class="page__main">
+      <div id="content"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+
+    <script data-site-root=".." src="../assets/js/site.js" defer></script>
+    <script src="../assets/js/lab-common.js"></script>
+
+    <script>
+      const md = `
+# Searching & Sorting in C
+
+---
+
+## 1. Searching Techniques
+
+> **Goal:** find the index (position) of a target value inside an array, or return \`-1\` if it does not exist.
+
+---
+
+### Linear Search (Sequential Search)
+
+**Idea:** start at index 0 and check each element one by one until you either find the target or reach the end of the array. No special structure is required — the array can be sorted or unsorted.
+
+**Example:** searching \`[5, 3, 8, 1, 9, 2]\` for \`8\` checks indices 0, 1, and 2, then returns index \`2\`.
+
+\`\`\`c
+int linearSearch(int arr[], int n, int target) {
+    for (int i = 0; i < n; i++) {
+        if (arr[i] == target) {
+            return i;    // found — return index
+        }
+    }
+    return -1;           // not found
+}
+\`\`\`
+
+> **Works on ANY array** — sorted or unsorted.
+> **Worst case:** n comparisons (target is at the end or not there at all).
+
+---
+
+### Binary Search
+
+**Idea:** the array **must be sorted**. Maintain a window of possible indices using \`low\` and \`high\`. Each step looks at the middle index of that window:
+
+- If the middle value equals the target → found.
+- If the target is larger → discard the left half (\`low = mid + 1\`).
+- If the target is smaller → discard the right half (\`high = mid - 1\`).
+
+The window shrinks by about half each time, which is why binary search is much faster than linear search on large sorted arrays.
+
+**Example:** searching \`[1, 3, 5, 7, 9, 11, 13]\` for \`9\` compares against \`7\` (too small, move right), then \`11\` (too large, move left), then \`9\` at index 4.
+
+\`\`\`c
+int binarySearch(int arr[], int n, int target) {
+    int low = 0, high = n - 1;
+
+    while (low <= high) {
+        int mid = (low + high) / 2;
+
+        if (arr[mid] == target) {
+            return mid;          // found
+        } else if (arr[mid] < target) {
+            low = mid + 1;       // go right
+        } else {
+            high = mid - 1;      // go left
+        }
+    }
+    return -1;                   // not found
+}
+\`\`\`
+
+> **Requires a sorted array.**
+> **Worst case:** roughly log₂(n) comparisons — dramatically faster than linear search for large arrays.
+
+---
+
+### Comparison Table
+
+Pick the search that matches your data: linear search needs no preparation; binary search needs sorted data but scales much better as arrays grow.
+
+| | Linear Search | Binary Search |
+|---|---|---|
+| Works on unsorted? | ✅ Yes | ❌ No — must be sorted |
+| Max comparisons | n | ~log₂(n) |
+| Best for | Small / unsorted data | Large sorted data |
+
+---
+
+## 2. Sorting Techniques
+
+> **Goal:** rearrange array elements into ascending or descending order.
+
+---
+
+### Bubble Sort
+
+**Idea (classic):** repeatedly compare **adjacent** elements and swap them if they are out of order. After each outer pass, the largest remaining value moves to the end.
+
+- **Ascending:** swap when \`arr[j] > arr[j + 1]\` (use \`>\`)
+- **Descending:** swap when \`arr[j] < arr[j + 1]\` (use \`<\`)
+
+\`\`\`c
+void bubbleSort(int arr[], int n) {
+    int i, j, temp;
+
+    for (i = 0; i < n - 1; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                temp         = arr[j];
+                arr[j]       = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+\`\`\`
+
+> **Key observation:** the inner limit \`n - i - 1\` shrinks each pass because the last \`i\` elements are already in their final positions.
+
+
+### Selection Sort
+
+**Idea:** split the array into a sorted part (left) and an unsorted part (right). For each position \`i\`, assume \`arr[i]\` is the minimum, scan the rest with \`j\` to find the real minimum, then swap it into place.
+
+Classic bubble sort swaps **neighbors** whenever they are out of order; selection sort **finds the minimum** in the unsorted range, then moves it to position \`i\`.
+
+\`\`\`c
+void selectionSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+
+        /* assume the current position holds the minimum */
+        int min_idx = i;
+
+        /* scan the unsorted portion for the actual minimum */
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[min_idx]) {
+                min_idx = j;
+            }
+        }
+
+        /* move minimum to its correct position */
+        int temp = arr[i];
+        arr[i] = arr[min_idx];
+        arr[min_idx] = temp;
+    }
+}
+\`\`\`
+
+**Example** on \`[64, 25, 12, 22, 11]\`: when \`i = 0\`, the inner loop finds \`11\` at index \`4\`, swaps with \`64\`, and the array becomes \`[11, 25, 12, 22, 64]\`.
+
+> The array is sorted **in place** — no separate output array is needed.
+> Each outer step places the next smallest value at index \`i\`.
+
+---
+
+### Sorting Comparison Table
+
+Both algorithms are simple O(n²) sorts suitable for small arrays or learning purposes. Classic bubble sort uses adjacent swaps; selection sort scans for the minimum, then places it in one swap. Use the table below to choose based on how many swaps you can afford and whether **stability** (keeping equal elements in their original order) matters.
+
+| | Bubble Sort | Selection Sort |
+|---|---|---|
+| Comparisons | ~n²/2 | ~n²/2 |
+| Swaps | Up to ~n²/2 | n−1 swap steps |
+| Stable? | ✅ Yes | ❌ No |
+| Best for | Teaching standard bubble sort | Minimizing swaps |
+
+---
+
+## 3. Practice Problems
+
+### Warm-Up: Predict the Output
+
+**1.** Trace this linear search. What does it print?
+
+\`\`\`c
+int arr[] = {5, 3, 8, 1, 9};
+int n = 5, target = 1, result = -1;
+
+for (int i = 0; i < n; i++) {
+    if (arr[i] == target) {
+        result = i;
+        break;
+    }
+}
+printf("Index: %d\\n", result);
+\`\`\`
+
+<!--ANSWER_1-->
+
+**2.** Trace this binary search. List every value of \`mid\` that gets checked, then state what is printed.
+
+\`\`\`c
+int arr[] = {2, 5, 8, 12, 16, 23, 38};
+int n = 7, target = 23;
+int low = 0, high = n - 1;
+
+while (low <= high) {
+    int mid = (low + high) / 2;
+    printf("Checking mid=%d (arr[mid]=%d)\\n", mid, arr[mid]);
+    if (arr[mid] == target)      { printf("Found at %d\\n", mid); break; }
+    else if (arr[mid] < target)  { low  = mid + 1; }
+    else                         { high = mid - 1; }
+}
+\`\`\`
+
+<!--ANSWER_2-->
+
+**3.** How many swaps does **classic Bubble Sort** (adjacent pairs, as in Section 2) make on this array in ascending order?
+
+\`\`\`
+[3, 1, 2]
+\`\`\`
+
+<!--ANSWER_3-->
+
+**4.** Trace the **first outer step** of Selection Sort (\`i = 0\`) on \`[64, 25, 12, 22, 11]\`. Which element ends up in position 0 and why?
+
+<!--ANSWER_4-->
+
+---
+
+### Core Practice: Fix the Bugs
+
+**5.** This binary search has two bugs. Find and fix them.
+
+\`\`\`c
+int binarySearch(int arr[], int n, int target) {
+    int low = 0, high = n;          // bug 1
+
+    while (low < high) {            // bug 2
+        int mid = (low + high) / 2;
+        if (arr[mid] == target) return mid;
+        else if (arr[mid] < target) low  = mid + 1;
+        else                        high = mid - 1;
+    }
+    return -1;
+}
+\`\`\`
+
+<!--ANSWER_5-->
+
+**6.** This **classic Bubble Sort** only runs **one pass** (no outer \`i\` loop). Fix it so it fully sorts the array.
+
+\`\`\`c
+void bubbleSort(int arr[], int n) {
+    for (int j = 0; j < n - 1; j++) {
+        if (arr[j] > arr[j + 1]) {
+            int temp = arr[j];
+            arr[j]   = arr[j + 1];
+            arr[j + 1] = temp;
+        }
+    }
+}
+\`\`\`
+
+<!--ANSWER_6-->
+
+---
+
+### Write Programs
+
+**7.** Write a C program to:
+- Read an array of \`n\` integers.
+- Read a target number from the user.
+- Search for the target using **Linear Search**.
+- Print the index of the element if found.
+- Otherwise print \`"Not Found"\`.
+
+<!--ANSWER_7-->
+
+**8.** Write a C program to:
+- Read \`n\`, then read an array of \`n\` integers.
+- Read a target number.
+- Count how many times the target appears using **Linear Search**.
+- Print the count.
+
+<!--ANSWER_8-->
+
+**9.** Write a C program to:
+- Read a **sorted** array containing duplicate values.
+- Read a target number.
+- Find the **first occurrence** and **last occurrence** using **Linear Search**.
+- Print their indices.
+
+Example: array \`[2, 4, 4, 4, 7]\`, target \`4\` → first index \`1\`, last index \`3\`.
+
+<!--ANSWER_9-->
+
+**10.** Write a C program to:
+- Read \`n\`, then read an array of \`n\` integers.
+- Find the **largest** element using traversal.
+- Print the value and its index.
+
+<!--ANSWER_10-->
+
+**11.** Write a C program to:
+- Read a **sorted** array.
+- Read a target number.
+- Search for the target using **Binary Search**.
+- Print its position if found.
+- Otherwise print \`"Not Found"\`.
+
+<!--ANSWER_11-->
+
+**12.** Write a C program to:
+- Read \`n\`, then read a **sorted** array of \`n\` integers.
+- Read a target number.
+- Perform **Binary Search** on the array.
+- Count the number of **comparisons** made during the search.
+- Print the count.
+
+<!--ANSWER_12-->
+
+**13.** Write a C program to:
+- Read \`n\`, then read a sorted array of \`n\` integers (may contain duplicates).
+- Read a target number.
+- Find the **first occurrence** of the target using **Binary Search**.
+- Print the index, or \`"Not Found"\` if it is not in the array.
+
+Example: array \`[1, 3, 3, 3, 5, 7]\`, target \`3\` → first index \`1\`.
+
+<!--ANSWER_13-->
+
+**14.** Write a C program where:
+- The array contains sorted numbers from \`1\` to \`100\`.
+- The user enters a target number.
+- The program finds it using **Binary Search**.
+- Print **each middle element** checked during the search.
+
+<!--ANSWER_14-->
+
+**15.** Write a C program to:
+- Read \`n\`, then read \`n\` integers.
+- Sort them in **ascending** order using **classic Bubble Sort** (adjacent pairs).
+- Print the array **after each pass**.
+
+<!--ANSWER_15-->
+
+**16.** Write a C program to:
+- Read \`n\`, then read \`n\` integers.
+- Sort the array in **descending** order using **classic Bubble Sort** (adjacent pairs).
+- Print the **final** sorted array.
+
+<!--ANSWER_16-->
+
+
+`;
+
+      const answers = {
+        ANSWER_1: {
+          title: "Answer — Problem 1",
+          content: `
+<pre><code>Index: 3</code></pre>
+<p>The loop checks indices 0, 1, and 2 without a match, then finds <code>1</code> at index 3, sets <code>result = 3</code>, and breaks. That takes <strong>4 comparisons</strong>.</p>
+`,
+        },
+        ANSWER_2: {
+          title: "Answer — Problem 2",
+          content: `
+<pre><code>Checking mid=3 (arr[3]=12)
+Checking mid=5 (arr[5]=23)
+Found at 5</code></pre>
+<p><strong>Values of <code>mid</code> checked:</strong> 3, then 5.</p>
+<p>Round 1: <code>arr[3] = 12</code> is less than 23, so search the right half (<code>low = 4</code>). Round 2: <code>arr[5] = 23</code> matches, so it prints <code>Found at 5</code>. Binary search used <strong>2 comparisons</strong>; linear search would need <strong>6</strong> on this array.</p>
+`,
+        },
+        ANSWER_3: {
+          title: "Answer — Problem 3",
+          content: `
+<p>Using <strong>classic bubble sort</strong> (adjacent pairs) on <code>[3, 1, 2]</code>:</p>
+<ul>
+  <li><strong><code>i = 0</code>:</strong> compare <code>(3,1)</code> → swap → <code>[1, 3, 2]</code>; compare <code>(3,2)</code> → swap → <code>[1, 2, 3]</code> (2 swaps).</li>
+  <li><strong><code>i = 1</code>:</strong> compare <code>(2,3)</code>? No — no swap.</li>
+</ul>
+<p><strong>2 swaps total.</strong></p>
+`,
+        },
+        ANSWER_4: {
+          title: "Answer — Problem 4",
+          content: `
+<p><strong>11 ends up in position 0.</strong></p>
+<p>On the <strong>first outer step</strong> (<code>i = 0</code>), <code>min_idx</code> starts at 0. The inner loop scans <code>j = 1</code> to <code>4</code> and updates <code>min_idx</code> to <code>4</code> (value <code>11</code>). After swapping <code>arr[0]</code> and <code>arr[4]</code>, the array is <code>[11, 25, 12, 22, 64]</code>.</p>
+<p><strong>Why:</strong> each outer step places the smallest value in the unsorted range into <code>arr[i]</code>.</p>
+`,
+        },
+        ANSWER_5: {
+          title: "Answer — Problem 5",
+          content: `
+<p><strong>Two bugs:</strong></p>
+<ol>
+  <li><code>high = n</code> → should be <code>high = n - 1</code><br>
+      <em>n</em> is out of bounds; the last valid index is <em>n − 1</em>.</li>
+  <li><code>while (low &lt; high)</code> → should be <code>while (low &lt;= high)</code><br>
+      When <code>low == high</code> there is still one element left to check; using strict <code>&lt;</code> misses it.</li>
+</ol>
+<pre><code class="language-c">int binarySearch(int arr[], int n, int target) {
+    int low = 0, high = n - 1;       // ✅ fix 1
+
+    while (low <= high) {            // ✅ fix 2
+        int mid = (low + high) / 2;
+        if (arr[mid] == target) return mid;
+        else if (arr[mid] < target) low  = mid + 1;
+        else                        high = mid - 1;
+    }
+    return -1;
+}</code></pre>
+`,
+        },
+        ANSWER_6: {
+          title: "Answer — Problem 6",
+          content: `
+<p>The function only runs the inner loop <strong>once</strong> (one pass). Add the outer <code>i</code> loop and shrink the inner limit each pass:</p>
+<pre><code class="language-c">void bubbleSort(int arr[], int n) {
+    int i, j, temp;
+
+    for (i = 0; i < n - 1; i++) {              // ✅ outer loop added
+        for (j = 0; j < n - i - 1; j++) {      // ✅ stop earlier each pass
+            if (arr[j] > arr[j + 1]) {
+                temp         = arr[j];
+                arr[j]       = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}</code></pre>
+<p>Each pass bubbles the largest remaining value to the end.</p>
+`,
+        },
+        ANSWER_7: {
+          title: "Answer — Problem 7",
+          content: `
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int n, target, arr[100];
+    int i, found = -1;
+
+    printf("Enter n: ");
+    scanf("%d", &amp;n);
+
+    printf("Enter %d integers: ", n);
+    for (i = 0; i &lt; n; i++)
+        scanf("%d", &amp;arr[i]);
+
+    printf("Enter target: ");
+    scanf("%d", &amp;target);
+
+    for (i = 0; i &lt; n; i++) {
+        if (arr[i] == target) {
+            found = i;
+            break;
+        }
+    }
+
+    if (found != -1)
+        printf("Index: %d\\n", found);
+    else
+        printf("Not Found\\n");
+
+    return 0;
+}</code></pre>
+`,
+        },
+        ANSWER_8: {
+          title: "Answer — Problem 8",
+          content: `
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int n, target, arr[100], count = 0;
+    int i;
+
+    printf("Enter n: ");
+    scanf("%d", &amp;n);
+
+    printf("Enter %d integers: ", n);
+    for (i = 0; i &lt; n; i++)
+        scanf("%d", &amp;arr[i]);
+
+    printf("Enter target: ");
+    scanf("%d", &amp;target);
+
+    for (i = 0; i &lt; n; i++) {
+        if (arr[i] == target)
+            count++;
+    }
+
+    printf("Count: %d\\n", count);
+    return 0;
+}</code></pre>
+`,
+        },
+        ANSWER_9: {
+          title: "Answer — Problem 9",
+          content: `
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int n, target, arr[100];
+    int i, first = -1, last = -1;
+
+    printf("Enter n: ");
+    scanf("%d", &amp;n);
+
+    printf("Enter %d sorted integers: ", n);
+    for (i = 0; i &lt; n; i++)
+        scanf("%d", &amp;arr[i]);
+
+    printf("Enter target: ");
+    scanf("%d", &amp;target);
+
+    for (i = 0; i &lt; n; i++) {
+        if (arr[i] == target) {
+            if (first == -1)
+                first = i;
+            last = i;
+        }
+    }
+
+    if (first == -1)
+        printf("Not Found\\n");
+    else {
+        printf("First occurrence: %d\\n", first);
+        printf("Last occurrence: %d\\n", last);
+    }
+
+    return 0;
+}</code></pre>
+<p>Example from the question: array <code>[2, 4, 4, 4, 7]</code>, target <code>4</code> → first <code>1</code>, last <code>3</code>.</p>
+`,
+        },
+        ANSWER_10: {
+          title: "Answer — Problem 10",
+          content: `
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int n, arr[100];
+    int i, maxVal, maxIdx;
+
+    printf("Enter n: ");
+    scanf("%d", &amp;n);
+
+    printf("Enter %d integers: ", n);
+    for (i = 0; i &lt; n; i++)
+        scanf("%d", &amp;arr[i]);
+
+    maxVal = arr[0];
+    maxIdx = 0;
+
+    for (i = 1; i &lt; n; i++) {
+        if (arr[i] &gt; maxVal) {
+            maxVal = arr[i];
+            maxIdx = i;
+        }
+    }
+
+    printf("Largest value: %d\\n", maxVal);
+    printf("Index: %d\\n", maxIdx);
+    return 0;
+}</code></pre>
+`,
+        },
+        ANSWER_11: {
+          title: "Answer — Problem 11",
+          content: `
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int n, target, arr[100];
+    int low, high, mid;
+
+    printf("Enter n: ");
+    scanf("%d", &amp;n);
+
+    printf("Enter %d sorted integers: ", n);
+    for (int i = 0; i &lt; n; i++)
+        scanf("%d", &amp;arr[i]);
+
+    printf("Enter target: ");
+    scanf("%d", &amp;target);
+
+    low = 0;
+    high = n - 1;
+
+    while (low &lt;= high) {
+        mid = (low + high) / 2;
+
+        if (arr[mid] == target) {
+            printf("Position: %d\\n", mid);
+            return 0;
+        } else if (arr[mid] &lt; target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+
+    printf("Not Found\\n");
+    return 0;
+}</code></pre>
+`,
+        },
+        ANSWER_12: {
+          title: "Answer — Problem 12",
+          content: `
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int n, target, arr[100];
+    int low, high, mid, comparisons = 0;
+
+    printf("Enter n: ");
+    scanf("%d", &amp;n);
+
+    printf("Enter %d sorted integers: ", n);
+    for (int i = 0; i &lt; n; i++)
+        scanf("%d", &amp;arr[i]);
+
+    printf("Enter target: ");
+    scanf("%d", &amp;target);
+
+    low = 0;
+    high = n - 1;
+
+    while (low &lt;= high) {
+        comparisons++;
+        mid = (low + high) / 2;
+
+        if (arr[mid] == target)
+            break;
+        else if (arr[mid] &lt; target)
+            low = mid + 1;
+        else
+            high = mid - 1;
+    }
+
+    printf("Comparisons: %d\\n", comparisons);
+    return 0;
+}</code></pre>
+`,
+        },
+        ANSWER_13: {
+          title: "Answer — Problem 13",
+          content: `
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int n, target, arr[100];
+    int low, high, mid, result = -1;
+
+    printf("Enter n: ");
+    scanf("%d", &amp;n);
+
+    printf("Enter %d sorted integers: ", n);
+    for (int i = 0; i &lt; n; i++)
+        scanf("%d", &amp;arr[i]);
+
+    printf("Enter target: ");
+    scanf("%d", &amp;target);
+
+    low = 0;
+    high = n - 1;
+
+    while (low &lt;= high) {
+        mid = (low + high) / 2;
+
+        if (arr[mid] == target) {
+            result = mid;
+            high = mid - 1;    /* keep searching left for an earlier match */
+        } else if (arr[mid] &lt; target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+
+    if (result == -1)
+        printf("Not Found\\n");
+    else
+        printf("First occurrence: %d\\n", result);
+
+    return 0;
+}</code></pre>
+<p>When a match is found, save the index and continue searching the left half. Example: array <code>[1, 3, 3, 3, 5, 7]</code>, target <code>3</code> → first index <code>1</code>.</p>
+`,
+        },
+        ANSWER_14: {
+          title: "Answer — Problem 14",
+          content: `
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int arr[100], target;
+    int low, high, mid, found = 0;
+
+    for (int i = 0; i &lt; 100; i++)
+        arr[i] = i + 1;
+
+    printf("Enter target (1 to 100): ");
+    scanf("%d", &amp;target);
+
+    low = 0;
+    high = 99;
+
+    while (low &lt;= high) {
+        mid = (low + high) / 2;
+        printf("Checking middle element: %d\\n", arr[mid]);
+
+        if (arr[mid] == target) {
+            found = 1;
+            break;
+        } else if (arr[mid] &lt; target) {
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+
+    if (found)
+        printf("Found at index %d\\n", mid);
+    else
+        printf("Not Found\\n");
+
+    return 0;
+}</code></pre>
+<p>Example: target <code>50</code> prints <code>Checking middle element: 50</code> once, then <code>Found at index 49</code>.</p>
+`,
+        },
+        ANSWER_15: {
+          title: "Answer — Problem 15",
+          content: `
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+void printArray(int arr[], int n) {
+    for (int i = 0; i &lt; n; i++)
+        printf("%d ", arr[i]);
+    printf("\\n");
+}
+
+int main() {
+    int n, arr[100], i, j, temp;
+
+    printf("Enter n: ");
+    scanf("%d", &amp;n);
+
+    printf("Enter %d integers: ", n);
+    for (i = 0; i &lt; n; i++)
+        scanf("%d", &amp;arr[i]);
+
+    for (i = 0; i &lt; n - 1; i++) {
+        for (j = 0; j &lt; n - i - 1; j++) {
+            if (arr[j] &gt; arr[j + 1]) {
+                temp         = arr[j];
+                arr[j]       = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+        printf("After pass %d: ", i + 1);
+        printArray(arr, n);
+    }
+
+    return 0;
+}</code></pre>
+<p>Example: input <code>n = 5</code>, array <code>5 1 4 2 3</code> → <code>After pass 1: 1 4 2 3 5</code>, <code>After pass 2: 1 2 3 4 5</code>, then passes 3 and 4 leave the array unchanged.</p>
+`,
+        },
+        ANSWER_16: {
+          title: "Answer — Problem 16",
+          content: `
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main() {
+    int n, arr[100], i, j, temp;
+
+    printf("Enter n: ");
+    scanf("%d", &amp;n);
+
+    printf("Enter %d integers: ", n);
+    for (i = 0; i &lt; n; i++)
+        scanf("%d", &amp;arr[i]);
+
+    for (i = 0; i &lt; n - 1; i++) {
+        for (j = 0; j &lt; n - i - 1; j++) {
+            if (arr[j] &lt; arr[j + 1]) {
+                temp         = arr[j];
+                arr[j]       = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+
+    printf("Sorted array (descending): ");
+    for (i = 0; i &lt; n; i++)
+        printf("%d ", arr[i]);
+    printf("\\n");
+
+    return 0;
+}</code></pre>
+<p>Example: input <code>n = 5</code>, array <code>4 2 7 1 9</code> → output <code>Sorted array (descending): 9 7 4 2 1</code>.</p>
+`,
+        },
+      };
+
+      marked.setOptions({ gfm: true, breaks: false });
+
+      document.getElementById("content").innerHTML = marked.parse(md);
+
+      const contentEl = document.getElementById("content");
+      let html = contentEl.innerHTML;
+
+      // Preserve danger-box divs
+      html = html.replace(
+        /&lt;div class="danger-box"&gt;/g,
+        '<div class="danger-box">',
+      );
+      html = html.replace(/&lt;\/div&gt;/g, "</div>");
+
+      for (const [key, ans] of Object.entries(answers)) {
+        const placeholder = "<!--" + key + "-->";
+        const replacement =
+          '<button class="answer-toggle" onclick="SiteLabs.toggleAnswer(\'' +
+          key +
+          "', this)\">" +
+          "▶ Show Answer</button>" +
+          '<div class="answer-block" id="' +
+          key +
+          '">' +
+          "<h4>✅ " +
+          ans.title +
+          "</h4>" +
+          ans.content +
+          "</div>";
+        html = html.replace(placeholder, replacement);
+      }
+
+      contentEl.innerHTML = html;
+
+      Prism.highlightAll();
+
+      SiteLabs.buildTocFromContent("#content", "#sidebar");
+    </script>
+  </body>
+</html>
